@@ -8,12 +8,16 @@ Sources:
   - yfinance: gold/silver/DXY daily closes (3mo) -> market strip + trend charts + G/S ratio
   - FRED (public CSV, no key): DGS2 (2Y), DFII10 (10Y real), CPIAUCSL (CPI YoY),
     PAYEMS (NFP monthly change) -> "Makro-trend" section
+
+Resilient: if FRED is slow/unreachable from CI, prices still update and the
+existing (last-good) macro data is kept — the run does not fail.
 """
 import re
 import io
 import csv
 import sys
 import json
+import time
 import urllib.request
 import datetime
 from pathlib import Path
@@ -25,6 +29,10 @@ HTML = Path(__file__).resolve().parent / "index.html"
 TICKERS = {"gold": "GC=F", "silver": "SI=F", "dxy": "DX-Y.NYB"}
 MONTHS = ["januari", "februari", "mars", "april", "maj", "juni", "juli",
           "augusti", "september", "oktober", "november", "december"]
+
+
+def _utcnow():
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 
 def fetch_prices() -> pd.DataFrame:
@@ -48,16 +56,23 @@ def build_series(df: pd.DataFrame) -> dict:
         "silver": [round(float(v), 2) for v in df["silver"]],
         "dxy":    [round(float(v), 2) for v in df["dxy"]],
         "gs":     [round(float(v), 1) for v in df["gs"]],
-        "asof": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+        "asof": _utcnow(),
     }
 
 
-def fred(series_id: str, start: str) -> list:
+def fred(series_id: str, start: str, attempts: int = 4) -> list:
     url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}&cosd={start}"
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    data = urllib.request.urlopen(req, timeout=30).read().decode()
-    rows = list(csv.reader(io.StringIO(data)))[1:]
-    return [(r[0], float(r[1])) for r in rows if len(r) >= 2 and r[1] not in (".", "")]
+    last = None
+    for i in range(attempts):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            data = urllib.request.urlopen(req, timeout=60).read().decode()
+            rows = list(csv.reader(io.StringIO(data)))[1:]
+            return [(r[0], float(r[1])) for r in rows if len(r) >= 2 and r[1] not in (".", "")]
+        except Exception as e:
+            last = e
+            time.sleep(4 * (i + 1))
+    raise last
 
 
 def _dm(s): y, m, d = s.split("-"); return f"{int(d)}/{int(m)}"
@@ -65,7 +80,7 @@ def _myy(s): y, m, d = s.split("-"); return f"{int(m)}/{y[2:]}"
 
 
 def build_macro() -> dict:
-    out = {"asof": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")}
+    out = {"asof": _utcnow()}
     for key, sid in (("us2y", "DGS2"), ("real", "DFII10")):
         d = fred(sid, "2026-04-01")[-65:]
         out[key] = {"dates": [_dm(x[0]) for x in d],
@@ -81,7 +96,7 @@ def build_macro() -> dict:
     return out
 
 
-def inject(series: dict, macro: dict) -> None:
+def inject(series: dict, macro) -> None:
     html = HTML.read_text(encoding="utf-8")
 
     def swap(marker_id, obj, var):
@@ -90,13 +105,13 @@ def inject(series: dict, macro: dict) -> None:
         return pat.subn(lambda m: m.group(1) + var + "=" + payload + ";" + m.group(2), html)
 
     html, n1 = swap("seriesdata", series, "window.__SERIES__")
-    html, n2 = swap("macrodata", macro, "window.__MACRO__")
+    n2 = "skip"
+    if macro is not None:
+        html, n2 = swap("macrodata", macro, "window.__MACRO__")
     now = datetime.date.today()
     datestr = f"{now.day} {MONTHS[now.month - 1]} {now.year}"
     html, n3 = re.subn(r'(<div class="eyebrow">[^<]*uppdaterad )[^<]*(</div>)',
                        lambda m: m.group(1) + datestr + m.group(2), html)
-    if n1 == 0 or n2 == 0:
-        print(f"VARNING: markers seriesdata:{n1} macrodata:{n2}", file=sys.stderr)
     HTML.write_text(html, encoding="utf-8")
     print(f"OK seriesdata:{n1} macrodata:{n2} eyebrow:{n3} datum '{datestr}'")
 
@@ -104,9 +119,14 @@ def inject(series: dict, macro: dict) -> None:
 def main():
     df = fetch_prices()
     s = build_series(df)
-    m = build_macro()
-    print(f"Guld ${s['gold'][-1]:,.0f} Silver ${s['silver'][-1]} G/S {s['gs'][-1]} DXY {s['dxy'][-1]} "
-          f"| 2Y {m['us2y']['vals'][-1]}% Real {m['real']['vals'][-1]}% CPI {m['cpi']['vals'][-1]}% NFP {m['nfp']['vals'][-1]:+.0f}k")
+    try:
+        m = build_macro()
+        print(f"2Y {m['us2y']['vals'][-1]}% Real {m['real']['vals'][-1]}% "
+              f"CPI {m['cpi']['vals'][-1]}% NFP {m['nfp']['vals'][-1]:+.0f}k")
+    except Exception as e:
+        print(f"VARNING: makro-hämtning misslyckades ({e}) — behåller senaste makrodata", file=sys.stderr)
+        m = None
+    print(f"Guld ${s['gold'][-1]:,.0f} Silver ${s['silver'][-1]} G/S {s['gs'][-1]} DXY {s['dxy'][-1]}")
     inject(s, m)
 
 
