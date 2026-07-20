@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<title>Makrosläpp — håller rörelsen?</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    /* neutrals: slate with a blue bias — chosen, not defaulted */
+    --bg:#f3f4f2; --panel:#ffffff; --panel-2:#f7f8f6;
+    --ink:#1b2230; --ink-soft:#55607a; --ink-faint:#8a93a8;
+    --line:#e2e5df; --line-strong:#cfd4cc;
+    /* accent: restrained brass — the metals */
+    --brass:#a9822f; --brass-soft:#c8a35b;
+    /* semantic (separate from accent) */
+    --hold:#2f8f5b; --hold-bg:#e6f2ea;
+    --fragile:#b9812b; --fragile-bg:#f6ecd8;
+    --fade:#c0463f; --fade-bg:#f7e3e1;
+    --shadow:0 1px 2px rgba(20,28,48,.05),0 8px 24px -12px rgba(20,28,48,.14);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0f1219; --panel:#171b25; --panel-2:#1c2130;
+      --ink:#e8ebf2; --ink-soft:#a3adc2; --ink-faint:#6b7690;
+      --line:#262c3a; --line-strong:#333b4d;
+      --brass:#d4ad5e; --brass-soft:#c8a35b;
+      --hold:#4fb47c; --hold-bg:#15271d;
+      --fragile:#d6a44a; --fragile-bg:#2a2213;
+      --fade:#e0685f; --fade-bg:#2c1615;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 30px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f3f4f2; --panel:#ffffff; --panel-2:#f7f8f6;
+    --ink:#1b2230; --ink-soft:#55607a; --ink-faint:#8a93a8;
+    --line:#e2e5df; --line-strong:#cfd4cc;
+    --brass:#a9822f; --brass-soft:#c8a35b;
+    --hold:#2f8f5b; --hold-bg:#e6f2ea;
+    --fragile:#b9812b; --fragile-bg:#f6ecd8;
+    --fade:#c0463f; --fade-bg:#f7e3e1;
+    --shadow:0 1px 2px rgba(20,28,48,.05),0 8px 24px -12px rgba(20,28,48,.14);
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1219; --panel:#171b25; --panel-2:#1c2130;
+    --ink:#e8ebf2; --ink-soft:#a3adc2; --ink-faint:#6b7690;
+    --line:#262c3a; --line-strong:#333b4d;
+    --brass:#d4ad5e; --brass-soft:#c8a35b;
+    --hold:#4fb47c; --hold-bg:#15271d;
+    --fragile:#d6a44a; --fragile-bg:#2a2213;
+    --fade:#e0685f; --fade-bg:#2c1615;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 30px -14px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased;padding:clamp(14px,3vw,40px)}
+  .wrap{max-width:1080px;margin:0 auto}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--brass);font-weight:600}
+  h1{font-size:clamp(22px,3.6vw,32px);line-height:1.1;margin:.35em 0 .15em;letter-spacing:-.02em;
+    text-wrap:balance;font-weight:680}
+  .sub{color:var(--ink-soft);max-width:60ch;font-size:15px;margin:0}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+    margin-bottom:clamp(18px,3vw,28px)}
+  .theme-btn{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--panel);color:var(--ink-soft);border:1px solid var(--line-strong);border-radius:8px;
+    padding:8px 12px;cursor:pointer;white-space:nowrap}
+  .theme-btn:hover{border-color:var(--brass-soft);color:var(--ink)}
+
+  /* verdict banner — summary before detail */
+  .verdict{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+    padding:clamp(16px,2.4vw,26px);margin-bottom:20px;display:grid;
+    grid-template-columns:minmax(0,1fr) auto;gap:clamp(16px,3vw,32px);align-items:center}
+  @media(max-width:640px){.verdict{grid-template-columns:1fr}}
+  .gauge-num{font-family:var(--mono);font-size:clamp(44px,9vw,68px);font-weight:600;line-height:.9;
+    letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .gauge-label{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.1em;
+    color:var(--ink-faint);margin-bottom:6px}
+  .verdict-tag{display:inline-flex;align-items:center;gap:8px;font-weight:650;font-size:clamp(16px,2.2vw,20px);
+    padding:2px 0;text-wrap:balance}
+  .dot{width:11px;height:11px;border-radius:50%;flex:none}
+  .verdict-note{color:var(--ink-soft);font-size:14px;margin:8px 0 0;max-width:46ch}
+  .meter{margin-top:14px}
+  .meter-track{height:10px;border-radius:6px;position:relative;overflow:hidden;
+    background:linear-gradient(90deg,var(--fade) 0%,var(--fragile) 50%,var(--hold) 100%);opacity:.85}
+  .meter-tick{position:absolute;top:-4px;width:3px;height:18px;border-radius:2px;background:var(--ink);
+    transition:left .25s ease;box-shadow:0 0 0 2px var(--panel)}
+  .meter-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
+    color:var(--ink-faint);margin-top:6px;letter-spacing:.05em}
+
+  .divergence{margin-top:16px;border-radius:12px;padding:12px 14px;font-size:13.5px;display:none;
+    gap:10px;align-items:flex-start;border:1px solid}
+  .divergence.show{display:flex}
+  .divergence.warn{background:var(--fade-bg);border-color:var(--fade);color:var(--ink)}
+  .divergence.ok{background:var(--hold-bg);border-color:var(--hold);color:var(--ink)}
+  .divergence b{font-weight:680}
+  .divergence .ic{font-family:var(--mono);font-weight:700;flex:none}
+
+  .cols{display:grid;grid-template-columns:1.35fr 1fr;gap:20px}
+  @media(max-width:820px){.cols{grid-template-columns:1fr}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+    padding:clamp(14px,2vw,22px)}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);
+    color:var(--ink-soft);margin:0 0 4px;font-weight:600}
+  .card .h2note{font-size:13px;color:var(--ink-faint);margin:0 0 16px}
+
+  .factor{padding:14px 0;border-top:1px solid var(--line)}
+  .factor:first-of-type{border-top:0;padding-top:2px}
+  .factor-head{display:flex;align-items:baseline;gap:10px;margin-bottom:9px}
+  .weight{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--brass);
+    background:var(--panel-2);border:1px solid var(--line-strong);border-radius:6px;padding:2px 7px;
+    flex:none;font-variant-numeric:tabular-nums}
+  .factor-name{font-weight:620;font-size:15px}
+  .factor-name small{display:block;font-weight:400;color:var(--ink-faint);font-size:12.5px;
+    letter-spacing:0;text-transform:none;margin-top:1px}
+  .seg{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+  .seg button{font-family:var(--sans);font-size:12px;font-weight:550;color:var(--ink-soft);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 4px;cursor:pointer;
+    line-height:1.2;transition:transform .06s ease,border-color .12s,background .12s,color .12s}
+  .seg button:hover{border-color:var(--line-strong)}
+  .seg button:active{transform:translateY(1px)}
+  .seg button.on{color:#fff;border-color:transparent;font-weight:650}
+  .seg button.on.bull{background:var(--hold)}
+  .seg button.on.bear{background:var(--fade)}
+  .seg button.on.neu{background:var(--ink-faint);color:var(--panel)}
+  .seg button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+  .overlay-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+  .toggle{display:inline-flex;gap:6px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
+    padding:4px}
+  .toggle button{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+    border:0;background:transparent;color:var(--ink-soft);padding:5px 10px;border-radius:6px;cursor:pointer}
+  .toggle button.on{background:var(--brass);color:#fff;font-weight:600}
+  .toggle button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+  /* checklist */
+  .phase{border-top:1px solid var(--line);padding:14px 0}
+  .phase:first-of-type{border-top:0;padding-top:2px}
+  .phase-title{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12px;
+    text-transform:uppercase;letter-spacing:.09em;color:var(--ink);font-weight:600;margin-bottom:10px}
+  .phase-title .num{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;flex:none;
+    background:var(--panel-2);border:1px solid var(--line-strong);color:var(--brass);font-size:11px}
+  .phase.star .phase-title .num{background:var(--brass);color:#fff;border-color:transparent}
+  .check{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer;font-size:13.5px;
+    color:var(--ink-soft)}
+  .check input{margin:2px 0 0;accent-color:var(--brass);width:16px;height:16px;flex:none;cursor:pointer}
+  .check.done{color:var(--ink-faint);text-decoration:line-through}
+
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 6px}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:600;border-radius:9px;padding:10px 15px;
+    cursor:pointer;border:1px solid var(--line-strong);background:var(--panel);color:var(--ink)}
+  .btn:hover{border-color:var(--brass-soft)}
+  .btn.primary{background:var(--brass);border-color:transparent;color:#fff}
+  .btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+  footer{margin-top:26px;color:var(--ink-faint);font-size:12.5px;line-height:1.6;
+    border-top:1px solid var(--line);padding-top:16px}
+  footer b{color:var(--ink-soft);font-weight:600}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:.05em;margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;color:var(--ink-soft)}
+  /* Fed + key dates panel */
+  .datestrip{margin-bottom:20px}
+  .ds-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(16px,3vw,30px)}
+  @media(max-width:720px){.ds-grid{grid-template-columns:1fr;gap:20px}}
+  .ds-fed{border-right:1px solid var(--line);padding-right:clamp(16px,3vw,30px)}
+  @media(max-width:720px){.ds-fed{border-right:0;border-bottom:1px solid var(--line);padding:0 0 18px}}
+  .fed-rate{font-family:var(--mono);font-size:clamp(30px,6vw,42px);font-weight:600;letter-spacing:-.02em;
+    line-height:1;font-variant-numeric:tabular-nums}
+  .fed-rate span{font-size:.42em;color:var(--ink-faint);margin-left:3px}
+  .fed-meta{color:var(--ink-soft);font-size:13px;margin:8px 0 15px;max-width:42ch}
+  .fed-meta b{color:var(--ink);font-weight:600}
+  .fed-next{display:flex;flex-direction:column;gap:11px}
+  .fed-next>div{display:flex;flex-direction:column;gap:2px;border-left:2px solid var(--brass-soft);padding-left:11px}
+  .fed-next .k{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint)}
+  .fed-next .v{font-weight:650;font-size:14px}
+  .fed-next .p{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+  .tl li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:11px;align-items:center;font-size:13px}
+  .tl .d{font-family:var(--mono);font-size:11.5px;color:var(--brass);font-weight:600;white-space:nowrap}
+  .tl .e{color:var(--ink-soft);min-width:0}.tl .e b{color:var(--ink)}
+  .tl .tag{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;
+    border-radius:5px;background:var(--hold-bg);color:var(--hold);font-weight:600;white-space:nowrap}
+  .tl .tag.nyckel{background:var(--brass-soft);color:var(--brass)}
+  .tl .tag.bull{background:var(--hold-bg);color:var(--hold)}
+  .tl .tag.bear{background:var(--fade-bg);color:var(--fade)}
+  .tl .tag.sido{background:transparent;color:var(--ink-faint);border:1px solid var(--line);font-weight:500}
+  .regime{margin:15px 0 0;padding-top:13px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft)}
+  .regime b{color:var(--ink);font-weight:600}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  /* market snapshot + trend charts */
+  .market{margin-bottom:20px}
+  .mkt-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .mkt-asof{font-family:var(--mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+  .mkt-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:12px;margin-bottom:16px}
+  .mkt-tile{border:1px solid var(--line);border-radius:10px;padding:11px 13px;background:var(--panel-2)}
+  .mkt-tile .lbl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-faint)}
+  .mkt-tile .val{font-size:20px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:3px;letter-spacing:-.01em}
+  .mkt-tile .chg{font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums;margin-top:2px}
+  .chg.up{color:var(--hold)} .chg.dn{color:var(--fade)} .chg.flat{color:var(--ink-faint)}
+  .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:14px}
+  .chart{border:1px solid var(--line);border-radius:10px;padding:12px 13px 10px;background:var(--panel-2)}
+  .chart-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .chart-title{font-size:13px;font-weight:600;color:var(--ink)}
+  .chart-now{font-family:var(--mono);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+  .chart canvas{width:100%;height:88px;display:block;margin:8px 0 6px}
+  .chart-foot{display:flex;justify-content:space-between;gap:6px;font-family:var(--mono);font-size:10px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+  .combo{border:1px solid var(--line);border-radius:10px;padding:12px 14px 10px;background:var(--panel-2);margin-top:14px}
+  .combo canvas{width:100%;height:190px;display:block;margin:8px 0 2px}
+  .mkt-legend{display:flex;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums}
+  .mkt-legend span{display:inline-flex;align-items:center;gap:5px;color:var(--ink-soft);white-space:nowrap}
+  .mkt-legend i{width:9px;height:9px;border-radius:2px;display:inline-block;flex:none}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Makrosläpp · CPI · PPI · Jobb · PCE · Fed · uppdaterad 20 juli 2026</div>
+      <h1>Håller rörelsen — eller fadar den?</h1>
+      <p class="sub">Katalysatorn är siffran. Räntorna och realräntan avgör om metallrörelsen håller.
+        Sätt riktning per faktor — modellen väger dem och läser ut om den initiala reaktionen har stöd.</p>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button">Tema</button>
+  </header>
+
+  <section class="verdict">
+    <div>
+      <div class="gauge-label">Composite-signal · guld/silver</div>
+      <div class="gauge-num" id="score">0</div>
+      <div class="verdict-tag" id="verdictTag"><span class="dot" style="background:var(--ink-faint)"></span>Sätt faktorerna</div>
+      <p class="verdict-note" id="verdictNote">−100 = stark motvind (rörelsen lär vända) · +100 = fullt stöd (troligt uthållig trend).</p>
+      <div class="divergence" id="divergence"><span class="ic">!</span><span id="divergenceText"></span></div>
+    </div>
+    <div style="min-width:min(260px,100%)">
+      <div class="meter">
+        <div class="meter-track"><div class="meter-tick" id="tick" style="left:50%"></div></div>
+        <div class="meter-scale"><span>−100 fade</span><span>0</span><span>+100 håller</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card datestrip" aria-label="Nyckeldatum och Fed-läge">
+    <div class="ds-grid">
+      <div class="ds-fed">
+        <h2>Fed-läge</h2>
+        <p class="h2note" style="margin-bottom:10px">Styrränta nu</p>
+        <div class="fed-rate">3,50–3,75<span>%</span></div>
+        <p class="fed-meta">Oförändrad sedan <b>17 juni</b> (Warshs första möte) · bias <b>hökaktig</b>, 9 av 18 vill höja i år · 0% sänkning prissatt på kort sikt.</p>
+        <div class="fed-next">
+          <div><span class="k">Nästa FOMC</span><span class="v">29 juli 2026</span><span class="p">0% sänkn · ~83% håll · ~17% höjn</span></div>
+          <div><span class="k">September</span><span class="v">Coin-flip håll/höjn</span><span class="p">44% höjn +25bp · ~51% håll · 0% sänkn</span></div>
+        </div>
+      </div>
+      <div class="ds-timeline">
+        <h2>Senaste släpp</h2>
+        <p class="h2note" style="margin-bottom:12px">Disinflation + svalnande jobb, tre släpp i rad</p>
+        <ol class="tl">
+          <li><span class="d">2 jul</span><span class="e"><b>Jobb (NFP)</b> +57k vs +115k väntat · apr+maj rev −74k · U-tal 4,2%</span><span class="tag bull">svag</span></li>
+          <li><span class="d">14 jul</span><span class="e"><b>CPI</b> −0,4% MoM · 3,5% YoY (från 4,2) · core 2,6% (från 2,9)</span><span class="tag bull">mjuk</span></li>
+          <li><span class="d">15 jul</span><span class="e"><b>PPI</b> −0,3% MoM · mest bensin −12%</span><span class="tag bull">mjuk</span></li>
+        </ol>
+        <h2 style="margin-top:20px">Kommande släpp</h2>
+        <p class="h2note" style="margin-bottom:12px">Alla datum verifierade mot BLS/BEA/Fed-kalendrarna (19 juli 2026)</p>
+        <ol class="tl">
+          <li><span class="d">23 jul</span><span class="e"><b>Jobless claims</b> (US, veckovis) · föreg 208k</span><span class="tag">sido</span></li>
+          <li><span class="d">24 jul</span><span class="e"><b>Flash-PMI</b> (US, tillverkning 53,9 + tjänster 51,2 föreg)</span><span class="tag">sido</span></li>
+          <li><span class="d">29 jul</span><span class="e"><b>FOMC-beslut</b> · ~83% håll · ~17% höjn · inga sänkn prissatta</span><span class="tag">nyckel</span></li>
+          <li><span class="d">30 jul</span><span class="e"><b>PCE</b> (jun) · Feds favoritmått, dagen efter FOMC</span><span class="tag">nyckel</span></li>
+          <li><span class="d">7 aug</span><span class="e"><b>Jobb (NFP)</b> (jul) · nästa hårda arbetsmarknads-print</span><span class="tag">nyckel</span></li>
+          <li><span class="d">12 aug</span><span class="e"><b>CPI</b> (jul) · håller disinflationen?</span><span class="tag">nyckel</span></li>
+          <li><span class="d">13 aug</span><span class="e"><b>PPI</b> (jul) · tillverkarledet</span><span class="tag">nyckel</span></li>
+        </ol>
+        <p class="regime"><b>Regim-lutning (1–3 mån):</b> disinflation + svalnande arbetsmarknad lutar <b>dovish</b>. Men reaktionsmodellen nedan mäter bara om <b>dagens</b> rörelse håller — kortare horisont, där energidriven print + reverserande olja + hökaktig Fed fortfarande dominerar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card market" aria-label="Marknadsläge och trender">
+    <div class="mkt-head">
+      <div>
+        <div class="eyebrow" style="margin-bottom:3px">Marknadsläge · rullande 3 mån</div>
+        <h2 style="margin:0">Guld · Silver · G/S · DXY</h2>
+      </div>
+      <span class="mkt-asof" id="mktAsof">—</span>
+    </div>
+    <div class="mkt-tiles" id="mktTiles"></div>
+    <div class="charts" id="mktCharts"></div>
+    <div class="combo">
+      <div class="chart-top"><span class="chart-title">Relativ trend · indexerat till 100 (3 mån)</span><span class="mkt-legend" id="comboLegend"></span></div>
+      <canvas id="comboCanvas"></canvas>
+    </div>
+    <p class="h2note" style="margin:12px 0 0">Serier bakas in vid varje refresh (yfinance dagsstängning) — endpoint = senaste stängning. Delta = rörelse över fönstret.</p>
+  </section>
+  <script id="seriesdata">window.__SERIES__={"dates": ["20/4", "21/4", "22/4", "23/4", "24/4", "27/4", "28/4", "29/4", "30/4", "1/5", "4/5", "5/5", "6/5", "7/5", "8/5", "11/5", "12/5", "13/5", "14/5", "15/5", "18/5", "19/5", "20/5", "21/5", "22/5", "26/5", "27/5", "28/5", "29/5", "1/6", "2/6", "3/6", "4/6", "5/6", "8/6", "9/6", "10/6", "11/6", "12/6", "15/6", "16/6", "17/6", "18/6", "22/6", "23/6", "24/6", "25/6", "26/6", "29/6", "30/6", "1/7", "2/7", "6/7", "7/7", "8/7", "9/7", "10/7", "13/7", "14/7", "15/7", "16/7", "17/7", "20/7"], "gold": [4806.6, 4698.4, 4732.5, 4705.1, 4722.3, 4675.4, 4591.5, 4545.2, 4614.7, 4629.9, 4519.5, 4555.8, 4681.9, 4699.8, 4720.4, 4718.7, 4677.6, 4697.7, 4678.1, 4555.8, 4552.5, 4506.3, 4531.3, 4539.8, 4521.0, 4500.4, 4447.5, 4499.3, 4560.5, 4475.2, 4489.1, 4436.7, 4475.8, 4337.1, 4335.9, 4260.0, 4108.2, 4090.3, 4215.0, 4328.0, 4330.9, 4358.9, 4224.1, 4181.9, 4129.9, 3990.3, 4030.5, 4078.7, 4022.3, 4022.9, 4068.3, 4112.7, 4155.1, 4145.3, 4070.9, 4130.6, 4104.1, 3997.0, 4061.1, 4044.0, 3985.6, 4012.7, 4008.4], "silver": [79.95, 76.41, 77.89, 75.46, 76.38, 75.0, 73.21, 71.57, 73.53, 75.95, 73.07, 73.11, 76.81, 79.7, 80.39, 85.49, 85.13, 88.89, 84.91, 77.16, 77.07, 74.83, 75.85, 76.41, 75.89, 76.31, 74.6, 75.64, 75.62, 75.01, 75.31, 73.48, 73.78, 68.94, 68.43, 65.09, 64.6, 63.88, 67.86, 70.07, 69.9, 70.7, 66.25, 65.53, 62.02, 58.05, 58.35, 59.22, 58.17, 59.48, 60.08, 60.64, 61.92, 60.93, 58.16, 60.38, 59.81, 57.63, 58.77, 57.11, 55.9, 56.04, 56.67], "dxy": [98.05, 98.41, 98.59, 98.8, 98.51, 98.48, 98.62, 98.92, 98.08, 98.21, 98.47, 98.48, 98.02, 98.25, 97.84, 97.94, 98.29, 98.48, 98.88, 99.27, 98.97, 99.3, 99.11, 99.19, 99.32, 99.17, 99.21, 99.02, 98.91, 99.2, 99.22, 99.53, 99.41, 100.07, 100.05, 99.91, 99.95, 99.86, 99.75, 99.63, 99.54, 100.09, 100.85, 101.02, 101.41, 101.61, 101.43, 101.36, 101.11, 101.19, 101.39, 100.86, 100.85, 101.14, 101.05, 100.94, 100.97, 101.28, 100.94, 100.5, 100.73, 100.75, 100.76], "gs": [60.1, 61.5, 60.8, 62.3, 61.8, 62.3, 62.7, 63.5, 62.8, 61.0, 61.8, 62.3, 61.0, 59.0, 58.7, 55.2, 54.9, 52.8, 55.1, 59.0, 59.1, 60.2, 59.7, 59.4, 59.6, 59.0, 59.6, 59.5, 60.3, 59.7, 59.6, 60.4, 60.7, 62.9, 63.4, 65.4, 63.6, 64.0, 62.1, 61.8, 62.0, 61.7, 63.8, 63.8, 66.6, 68.7, 69.1, 68.9, 69.1, 67.6, 67.7, 67.8, 67.1, 68.0, 70.0, 68.4, 68.6, 69.4, 69.1, 70.8, 71.3, 71.6, 70.7], "asof": "2026-07-20 07:22 UTC"};</script>
+
+  <section class="card market" aria-label="Makro-trend">
+    <div class="mkt-head">
+      <div>
+        <div class="eyebrow" style="margin-bottom:3px">Makro-trend · modellens input</div>
+        <h2 style="margin:0">2Y-ränta · Realränta · CPI · Jobb</h2>
+      </div>
+      <span class="mkt-asof" id="macroAsof">—</span>
+    </div>
+    <div class="charts" id="macroCharts"></div>
+    <p class="h2note" style="margin:12px 0 0">FRED-serier. 2Y + realränta = dagliga (3 mån); CPI YoY + NFP-förändring = månadsvis. <b>Stigande ränta/realränta = motvind för metaller.</b></p>
+  </section>
+  <script id="macrodata">window.__MACRO__={"asof": "2026-07-20 07:22 UTC", "us2y": {"dates": ["14/4", "15/4", "16/4", "17/4", "20/4", "21/4", "22/4", "23/4", "24/4", "27/4", "28/4", "29/4", "30/4", "1/5", "4/5", "5/5", "6/5", "7/5", "8/5", "11/5", "12/5", "13/5", "14/5", "15/5", "18/5", "19/5", "20/5", "21/5", "22/5", "26/5", "27/5", "28/5", "29/5", "1/6", "2/6", "3/6", "4/6", "5/6", "8/6", "9/6", "10/6", "11/6", "12/6", "15/6", "16/6", "17/6", "18/6", "22/6", "23/6", "24/6", "25/6", "26/6", "29/6", "30/6", "1/7", "2/7", "6/7", "7/7", "8/7", "9/7", "10/7", "13/7", "14/7", "15/7", "16/7"], "vals": [3.76, 3.76, 3.78, 3.71, 3.72, 3.78, 3.79, 3.83, 3.78, 3.78, 3.84, 3.92, 3.88, 3.88, 3.95, 3.93, 3.87, 3.92, 3.9, 3.95, 4.0, 3.98, 4.0, 4.09, 4.07, 4.13, 4.04, 4.08, 4.13, 4.01, 4.0, 3.99, 3.98, 4.05, 4.05, 4.08, 4.05, 4.17, 4.15, 4.13, 4.13, 4.05, 4.09, 4.07, 4.05, 4.2, 4.19, 4.24, 4.16, 4.11, 4.09, 4.07, 4.1, 4.14, 4.17, 4.14, 4.13, 4.19, 4.21, 4.16, 4.21, 4.26, 4.18, 4.13, 4.16], "unit": "%", "dec": 2}, "real": {"dates": ["14/4", "15/4", "16/4", "17/4", "20/4", "21/4", "22/4", "23/4", "24/4", "27/4", "28/4", "29/4", "30/4", "1/5", "4/5", "5/5", "6/5", "7/5", "8/5", "11/5", "12/5", "13/5", "14/5", "15/5", "18/5", "19/5", "20/5", "21/5", "22/5", "26/5", "27/5", "28/5", "29/5", "1/6", "2/6", "3/6", "4/6", "5/6", "8/6", "9/6", "10/6", "11/6", "12/6", "15/6", "16/6", "17/6", "18/6", "22/6", "23/6", "24/6", "25/6", "26/6", "29/6", "30/6", "1/7", "2/7", "6/7", "7/7", "8/7", "9/7", "10/7", "13/7", "14/7", "15/7", "16/7"], "vals": [1.89, 1.9, 1.93, 1.9, 1.91, 1.92, 1.92, 1.92, 1.89, 1.91, 1.92, 1.96, 1.94, 1.91, 1.95, 1.96, 1.94, 1.96, 1.93, 1.95, 1.99, 1.99, 2.0, 2.1, 2.13, 2.18, 2.13, 2.18, 2.16, 2.1, 2.09, 2.06, 2.07, 2.07, 2.07, 2.11, 2.11, 2.19, 2.21, 2.2, 2.21, 2.16, 2.17, 2.15, 2.14, 2.23, 2.21, 2.28, 2.29, 2.23, 2.19, 2.18, 2.16, 2.2, 2.25, 2.26, 2.24, 2.3, 2.31, 2.31, 2.32, 2.36, 2.33, 2.32, 2.35], "unit": "%", "dec": 2}, "cpi": {"dates": ["4/25", "5/25", "6/25", "7/25", "8/25", "9/25", "11/25", "12/25", "1/26", "2/26", "3/26", "4/26", "5/26", "6/26"], "vals": [2.3, 2.4, 2.7, 2.7, 2.9, 3.0, 3.0, 3.0, 2.8, 2.7, 3.3, 3.9, 4.3, 3.7], "unit": "%", "dec": 1}, "nfp": {"dates": ["5/25", "6/25", "7/25", "8/25", "9/25", "10/25", "11/25", "12/25", "1/26", "2/26", "3/26", "4/26", "5/26", "6/26"], "vals": [13, -20, 64, -70, 76, -140, 41, -17, 160, -156, 214, 148, 129, 57], "unit": "k", "dec": 0}};</script>
+
+  <div class="cols">
+    <section class="card" aria-label="Viktade faktorer">
+      <h2>Viktade faktorer</h2>
+      <p class="h2note">Riktning för metaller: fallande räntor/DXY = medvind (+), stigande = motvind (−).</p>
+      <div id="factors"></div>
+
+      <div class="factor" style="border-top:1px solid var(--line)">
+        <div class="factor-head">
+          <span class="weight" style="color:var(--ink-soft)">overlay</span>
+          <span class="factor-name">Brent-overlay
+            <small>Om printen var energidriven och oljan vänder upp — orsaken reverserar.</small></span>
+        </div>
+        <div class="overlay-row">
+          <div class="toggle" id="energyToggle" role="group" aria-label="Var printen energidriven?">
+            <span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding:5px 4px 5px 8px;text-transform:uppercase;letter-spacing:.05em">Energidriven?</span>
+            <button data-v="1" type="button">Ja</button>
+            <button data-v="0" type="button" class="on">Nej</button>
+          </div>
+          <div class="toggle" id="brentToggle" role="group" aria-label="Brent-riktning">
+            <span style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding:5px 4px 5px 8px;text-transform:uppercase;letter-spacing:.05em">Brent</span>
+            <button data-v="up" type="button">Upp</button>
+            <button data-v="flat" type="button" class="on">Flat</button>
+            <button data-v="down" type="button">Ner</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="loadLatest" type="button">Ladda senaste släppet</button>
+        <button class="btn" id="reset" type="button">Nollställ</button>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Tre-fas-checklista">
+      <h2>Tre faser</h2>
+      <p class="h2note">Spelbok för släpp-dagen — bocka i realtid. Fas 1–2 = observera (döm inte de första 5 min). <b>Fas 3 ★ (efter 1–3h) är signalen</b> — där syns om rörelsen höll. De två "sätter …"-raderna i fas 3 flyttar modellens 2Y- och DXY-faktor direkt.</p>
+      <div id="phases"></div>
+    </section>
+  </div>
+
+  <footer>
+    <b>Läsning:</b> katalysator utan bekräftelse = fade. Om siffran fick metaller att rusa men US02Y och
+    realräntan inte följer med (eller realräntan stiger), underkänner räntemarknaden printen — precis juni 2026.
+    <div class="legend">
+      <span><span class="dot" style="background:var(--hold)"></span>Håller</span>
+      <span><span class="dot" style="background:var(--fragile)"></span>Bräcklig</span>
+      <span><span class="dot" style="background:var(--fade)"></span>Fade-risk</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // ---- theme ----
+  var root=document.documentElement, tb=document.getElementById("themeBtn");
+  tb.addEventListener("click",function(){
+    var cur=root.getAttribute("data-theme");
+    if(!cur){cur=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";}
+    root.setAttribute("data-theme",cur==="dark"?"light":"dark");
+  });
+
+  // ---- factors (his weights) ----
+  // score scale per option: -2..+2 (bearish -> bullish for metals)
+  var FACTORS=[
+    {key:"us2y",w:25,name:"US02Y",sub:"2-årsräntan — Feds bana på kort sikt",
+     opts:[["Steg kraftigt",-2,"bear"],["Steg",-1,"bear"],["Oförändrad",0,"neu"],["Föll",1,"bull"],["Föll kraftigt",2,"bull"]]},
+    {key:"real",w:22,name:"US10Y realränta",sub:"10Y TIPS — guldets verkliga motståndare",
+     opts:[["Steg kraftigt",-2,"bear"],["Steg",-1,"bear"],["Oförändrad",0,"neu"],["Föll",1,"bull"],["Föll kraftigt",2,"bull"]]},
+    {key:"dxy",w:15,name:"DXY",sub:"Dollarindex",
+     opts:[["Steg kraftigt",-2,"bear"],["Steg",-1,"bear"],["Oförändrad",0,"neu"],["Föll",1,"bull"],["Föll kraftigt",2,"bull"]]},
+    {key:"jobs",w:15,name:"Arbetsmarknad",sub:"NFP / löner / arbetslöshet — svagt = dovish = bull metaller",
+     opts:[["Mycket stark",-2,"bear"],["Stark",-1,"bear"],["I linje",0,"neu"],["Svag",1,"bull"],["Mycket svag",2,"bull"]]},
+    {key:"pos",w:10,name:"Positionering / flöden",sub:"Optionsflöden, dealer-gamma, CoT",
+     opts:[["Överköpt long",-2,"bear"],["Sträckt",-1,"bear"],["Neutral",0,"neu"],["Stödjande",1,"bull"],["Plats att köpa",2,"bull"]]},
+    {key:"print",w:13,name:"Inflations-print (CPI/PPI/PCE)",sub:"Kvalitet väger mer än rubriken",
+     opts:[["Het",-2,"bear"],["Något het",-1,"bear"],["I linje",0,"neu"],["Mjuk (energi)",0,"neu"],["Mjuk + core",2,"bull"]]}
+  ];
+
+  var state={}; FACTORS.forEach(function(f){state[f.key]=null;});
+  var energy=0, brent="flat", printSoft=false;
+
+  var fWrap=document.getElementById("factors");
+  FACTORS.forEach(function(f){
+    var el=document.createElement("div"); el.className="factor";
+    var opts=f.opts.map(function(o,i){
+      var cls=o[2]==="bull"?"bull":o[2]==="bear"?"bear":"neu";
+      return '<button type="button" data-i="'+i+'" data-cls="'+cls+'">'+o[0]+'</button>';
+    }).join("");
+    el.innerHTML='<div class="factor-head"><span class="weight">'+f.w+'%</span>'+
+      '<span class="factor-name">'+f.name+'<small>'+f.sub+'</small></span></div>'+
+      '<div class="seg" data-key="'+f.key+'">'+opts+'</div>';
+    fWrap.appendChild(el);
+  });
+
+  fWrap.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-i]"); if(!b) return;
+    var seg=b.parentNode, key=seg.getAttribute("data-key"), i=+b.getAttribute("data-i");
+    seg.querySelectorAll("button").forEach(function(x){x.classList.remove("on","bull","bear","neu");});
+    b.classList.add("on",b.getAttribute("data-cls"));
+    var opt=FACTORS.filter(function(f){return f.key===key;})[0].opts[i];
+    state[key]=opt[1];
+    if(key==="print") printSoft=/^Mjuk/.test(opt[0]);
+    render();
+  });
+
+  // overlay toggles
+  function wireToggle(id,set){
+    var g=document.getElementById(id);
+    g.addEventListener("click",function(e){
+      var b=e.target.closest("button[data-v]"); if(!b) return;
+      g.querySelectorAll("button[data-v]").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); set(b.getAttribute("data-v")); render();
+    });
+  }
+  wireToggle("energyToggle",function(v){energy=+v;});
+  wireToggle("brentToggle",function(v){brent=v;});
+
+  // ---- phases ----
+  var PHASES=[
+    {t:"Före rapporten",star:false,items:["Vad väntar marknaden (konsensus)?","Hur är positioneringen?","Vad prisar Fed-futures in?"]},
+    {t:"Första 5 minuterna",star:false,items:["US02Y-reaktion","DXY-reaktion","Guld","Silver"]},
+    {t:"Efter 1–3 timmar",star:true,items:["Behöll US02Y sin rörelse (dovish höll)? · sätter 2Y","Stannade DXY nere (vände inte upp)? · sätter DXY","Fortsatte S&P i samma riktning?","Behöll guld/silver minst ~hälften av rörelsen?"]}
+  ];
+  var pWrap=document.getElementById("phases");
+  PHASES.forEach(function(p,pi){
+    var el=document.createElement("div"); el.className="phase"+(p.star?" star":"");
+    var items=p.items.map(function(t,ii){
+      return '<label class="check"><input type="checkbox" data-p="'+pi+'-'+ii+'"><span>'+t+'</span></label>';
+    }).join("");
+    el.innerHTML='<div class="phase-title"><span class="num">'+(pi+1)+'</span>'+p.t+
+      (p.star?' <span style="color:var(--brass)">★</span>':'')+'</div>'+items;
+    pWrap.appendChild(el);
+  });
+  pWrap.addEventListener("change",function(e){
+    var cb=e.target; if(!cb||cb.type!=="checkbox") return;
+    var lbl=cb.closest("label"); if(lbl) lbl.classList.toggle("done",cb.checked);
+    // Fas 3: två observationer nudgar modellens hold-faktorer. [key, idx om bockad, idx om av]
+    var MAP={"2-0":["us2y",3,1],"2-1":["dxy",3,1]};
+    var mm=MAP[cb.getAttribute("data-p")];
+    if(mm){ setSeg(mm[0], cb.checked?mm[1]:mm[2]); render(); }
+  });
+
+  // ---- scoring ----
+  function render(){
+    var sum=0, answered=0, maxW=0;
+    FACTORS.forEach(function(f){
+      maxW+=f.w;
+      if(state[f.key]!==null){ sum+=f.w*(state[f.key]/2); answered++; }
+    });
+    // normalize to -100..100 over the full weight (unanswered count as 0/neutral)
+    var comp=Math.round((sum/ (maxW/1) )*100); // maxW=100, sum max=100
+    // Brent overlay: energy-driven print + rising oil pulls the score down (cause reversing)
+    var overlayNote="";
+    if(energy===1 && brent==="up"){ comp-=18; overlayNote=" Orsaken reverserar (energidriven print, Brent upp)."; }
+    else if(energy===1 && brent==="down"){ comp+=6; overlayNote=" Energidriven men Brent faller — disinflationen kan hålla."; }
+    comp=Math.max(-100,Math.min(100,comp));
+
+    document.getElementById("score").textContent=(comp>0?"+":"")+comp;
+    document.getElementById("tick").style.left=((comp+100)/2)+"%";
+
+    var band, color, note;
+    if(answered===0){ band="Sätt faktorerna"; color="var(--ink-faint)";
+      note="−100 = stark motvind (rörelsen lär vända) · +100 = fullt stöd (troligt uthållig trend)."; }
+    else if(comp>=40){ band="Rörelsen har stöd — troligt uthållig"; color="var(--hold)";
+      note="Räntemarknaden bekräftar katalysatorn. Trenden kan hålla bortom första reflexen."+overlayNote; }
+    else if(comp>=12){ band="Delvis stöd — bräcklig"; color="var(--fragile)";
+      note="Viss bekräftelse, men inte samstämmig. Bevaka 1–3h-fönstret innan du litar på rörelsen."+overlayNote; }
+    else if(comp>-12){ band="Blandat — hög fade-risk"; color="var(--fade)";
+      note="Räntemarknaden underkänner delvis printen. Initial rörelse riskerar att fada."+overlayNote; }
+    else { band="Motvind — rörelsen lär vända"; color="var(--fade)";
+      note="Faktorerna pekar mot metaller. En bullish print utan ränte-stöd fadar/vänder."+overlayNote; }
+
+    document.getElementById("verdictTag").innerHTML='<span class="dot" style="background:'+color+'"></span>'+band;
+    document.getElementById("verdictNote").textContent=note;
+
+    // divergence detector: bullish print (metals rallied) but rates didn't confirm
+    var div=document.getElementById("divergence"), dt=document.getElementById("divergenceText");
+    var printBull = state.print!==null && state.print>0;
+    var ratesConfirm = (state.us2y||0)>0 && (state.real||0)>=0;
+    var ratesReject = (state.us2y!==null||state.real!==null) &&
+                      ((state.us2y||0)<=0 && (state.real||0)<=0) &&
+                      ((state.real||0)<0 || (state.us2y||0)<0);
+    div.className="divergence";
+    if(printSoft && ratesReject){
+      div.classList.add("show","warn");
+      dt.innerHTML="<b>Divergens:</b> mjuk print (bull rubrik) men US02Y/realräntan bekräftar inte — realräntan steg eller 2Y rörde sig knappt. Räntemarknaden tror inte på printen. <b>Fade-mönstret (juni 2026).</b>";
+    } else if(printBull && ratesConfirm && comp>=40){
+      div.classList.add("show","ok");
+      dt.innerHTML="<b>Samstämmigt:</b> bull print OCH räntemarknaden följer med. Det är då en rörelse brukar hålla bortom första 5 min.";
+    }
+  }
+
+  // ---- presets ----
+  function setSeg(key,idx){
+    var seg=fWrap.querySelector('.seg[data-key="'+key+'"]');
+    var b=seg.querySelector('button[data-i="'+idx+'"]');
+    seg.querySelectorAll("button").forEach(function(x){x.classList.remove("on","bull","bear","neu");});
+    b.classList.add("on",b.getAttribute("data-cls"));
+    var opt=FACTORS.filter(function(f){return f.key===key;})[0].opts[idx];
+    state[key]=opt[1];
+    if(key==="print") printSoft=/^Mjuk/.test(opt[0]);
+  }
+  function setToggle(id,v){
+    var g=document.getElementById(id);
+    g.querySelectorAll("button[data-v]").forEach(function(x){x.classList.toggle("on",x.getAttribute("data-v")===v);});
+  }
+  // ---- SENASTE SLÄPP (uppdateras av /macro-release-skillen vid varje körning) ----
+  // Knappen "Ladda senaste släppet" läser ALLTID härifrån. Byt bara detta objekt —
+  // aldrig knappens text. Släppets namn/datum står i .label.
+  var LATEST={
+    label:"CPI 14 juli 2026",
+    // 2Y föll bara ~4bp på -0,4% CPI = icke-bekräftelse (0); 10Y realränta steg (-1);
+    // DXY föll ~-0,28% (+1); jobb (2/7) +57k vs +115k, U-tal 4,2% = svag (+1);
+    // positionering ingen verifierad flödesdata (0); print mjuk men energidriven, core flat;
+    // energidriven=ja, Brent upp (US-Iran)
+    us2y:2, real:1, dxy:3, jobs:3, pos:2, print:3, energy:1, brent:"up"
+  };
+  document.getElementById("loadLatest").addEventListener("click",function(){
+    setSeg("us2y",LATEST.us2y); setSeg("real",LATEST.real); setSeg("dxy",LATEST.dxy);
+    setSeg("jobs",LATEST.jobs); setSeg("pos",LATEST.pos); setSeg("print",LATEST.print);
+    energy=LATEST.energy; brent=LATEST.brent;
+    setToggle("energyToggle",String(LATEST.energy)); setToggle("brentToggle",LATEST.brent);
+    render();
+  });
+  document.getElementById("reset").addEventListener("click",function(){
+    FACTORS.forEach(function(f){ state[f.key]=null;
+      fWrap.querySelector('.seg[data-key="'+f.key+'"]').querySelectorAll("button")
+        .forEach(function(x){x.classList.remove("on","bull","bear","neu");});
+    });
+    energy=0; brent="flat"; printSoft=false; setToggle("energyToggle","0"); setToggle("brentToggle","flat");
+    document.querySelectorAll(".check input:checked").forEach(function(c){c.checked=false;
+      c.closest("label").classList.remove("done");});
+    render();
+  });
+
+  render();
+})();
+</script>
+
+<script>
+/* Marknadslage-strip + trend-grafer. Laser window.__SERIES__ (bakas in av dashboard_refresh.py). */
+(function(){
+  var S=window.__SERIES__||{};
+  var chartsEl=document.getElementById("mktCharts"), tilesEl=document.getElementById("mktTiles");
+  if(!S.dates||!S.dates.length){ if(chartsEl) chartsEl.innerHTML='<p class="h2note">Ingen serie-data annu.</p>'; return; }
+  var META=[
+    {key:"gold",  title:"Guld",              pre:"$", dec:0, color:"#d4ad5e"},
+    {key:"silver",title:"Silver",            pre:"$", dec:2, color:"#9bb4cf"},
+    {key:"gs",    title:"Guld/Silver-ratio", pre:"",  dec:1, color:"#c08457"},
+    {key:"dxy",   title:"DXY",               pre:"",  dec:2, color:"#7fae8f"}
+  ];
+  function nf(v,dec){ return (v==null)?"—":Number(v).toLocaleString("sv-SE",{minimumFractionDigits:dec,maximumFractionDigits:dec}); }
+  var asofEl=document.getElementById("mktAsof"); if(asofEl) asofEl.textContent = S.asof ? ("kl "+S.asof) : "";
+  var canvases=[];
+  META.forEach(function(m){
+    var a=S[m.key]||[]; if(!a.length) return;
+    var cur=a[a.length-1], first=a[0];
+    var pct=(first&&cur)?((cur-first)/first*100):0;
+    var dir=pct>0.05?"up":(pct<-0.05?"dn":"flat"), arrow=dir==="up"?"▲":(dir==="dn"?"▼":"→");
+    var t=document.createElement("div"); t.className="mkt-tile";
+    t.innerHTML='<div class="lbl">'+m.title+'</div><div class="val">'+m.pre+nf(cur,m.dec)+'</div>'+
+      '<div class="chg '+dir+'">'+arrow+' '+nf(Math.abs(pct),1)+'% · 3 man</div>';
+    tilesEl.appendChild(t);
+    var c=document.createElement("div"); c.className="chart";
+    c.innerHTML='<div class="chart-top"><span class="chart-title">'+m.title+'</span><span class="chart-now">'+m.pre+nf(cur,m.dec)+'</span></div>'+
+      '<canvas></canvas>'+
+      '<div class="chart-foot"><span>'+(S.dates[0]||"")+'</span><span>lo '+nf(Math.min.apply(null,a),m.dec)+' · hi '+nf(Math.max.apply(null,a),m.dec)+'</span><span>'+(S.dates[S.dates.length-1]||"")+'</span></div>';
+    chartsEl.appendChild(c);
+    canvases.push({cv:c.querySelector("canvas"),data:a,color:m.color});
+  });
+  // ---- Makro-trend (FRED: 2Y, realranta, CPI YoY, NFP) ----
+  var MMETA=[
+    {key:"us2y",title:"2Y-ränta",     suf:"%",dec:2,color:"#8fa8c8",bps:1},
+    {key:"real",title:"10Y realränta",suf:"%",dec:2,color:"#c99a63",bps:1},
+    {key:"cpi", title:"CPI YoY",      suf:"%",dec:1,color:"#cf7b72"},
+    {key:"nfp", title:"Jobb (NFP Δ)", suf:"k",dec:0,color:"#7fae8f"}
+  ];
+  var M=window.__MACRO__||{};
+  var macroEl=document.getElementById("macroCharts"), macroAsofEl=document.getElementById("macroAsof");
+  if(macroAsofEl) macroAsofEl.textContent = M.asof ? ("kl "+M.asof) : "";
+  if(macroEl){
+    MMETA.forEach(function(m){
+      var o=M[m.key]; if(!o||!o.vals||!o.vals.length) return;
+      var a=o.vals, cur=a[a.length-1], prev=a[a.length-2];
+      var chg=(prev!=null)?(cur-prev):0, arrow=chg>0?"▲":(chg<0?"▼":"→");
+      var chgstr=m.bps?((chg>=0?"+":"")+Math.round(chg*100)+" bp"):((chg>=0?"+":"")+nf(chg,m.dec)+m.suf);
+      var c=document.createElement("div"); c.className="chart";
+      c.innerHTML='<div class="chart-top"><span class="chart-title">'+m.title+'</span><span class="chart-now">'+nf(cur,m.dec)+m.suf+'</span></div>'+
+        '<canvas></canvas>'+
+        '<div class="chart-foot"><span>'+(o.dates[0]||"")+'</span><span>'+arrow+' '+chgstr+' senaste</span><span>'+(o.dates[o.dates.length-1]||"")+'</span></div>';
+      macroEl.appendChild(c);
+      canvases.push({cv:c.querySelector("canvas"),data:a,color:m.color});
+    });
+  }
+  function tok(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||"#888"; }
+  function draw(o){
+    var cv=o.cv, data=o.data; if(!cv||!data.length) return;
+    var ratio=Math.max(1,window.devicePixelRatio||1);
+    var w=cv.clientWidth||240, h=cv.clientHeight||88;
+    cv.width=Math.round(w*ratio); cv.height=Math.round(h*ratio);
+    var ctx=cv.getContext("2d"); ctx.setTransform(ratio,0,0,ratio,0,0); ctx.clearRect(0,0,w,h);
+    var min=Math.min.apply(null,data), max=Math.max.apply(null,data), pad=(max-min)*0.12||1; min-=pad; max+=pad;
+    var pl=2,pr=2,pt=7,pb=7;
+    function X(i){ return pl+(w-pl-pr)*(data.length<2?0.5:i/(data.length-1)); }
+    function Y(v){ return pt+(h-pt-pb)*(1-(v-min)/(max-min||1)); }
+    ctx.strokeStyle=tok("--line"); ctx.lineWidth=1;
+    var ymid=pt+(h-pt-pb)*0.5; ctx.beginPath(); ctx.moveTo(pl,ymid); ctx.lineTo(w-pr,ymid); ctx.stroke();
+    var grad=ctx.createLinearGradient(0,pt,0,h-pb); grad.addColorStop(0,o.color+"55"); grad.addColorStop(1,o.color+"00");
+    ctx.beginPath(); ctx.moveTo(X(0),Y(data[0])); for(var i=1;i<data.length;i++) ctx.lineTo(X(i),Y(data[i]));
+    ctx.lineTo(X(data.length-1),h-pb); ctx.lineTo(X(0),h-pb); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(X(0),Y(data[0])); for(var j=1;j<data.length;j++) ctx.lineTo(X(j),Y(data[j]));
+    ctx.strokeStyle=o.color; ctx.lineWidth=2; ctx.lineJoin="round"; ctx.lineCap="round"; ctx.stroke();
+    var ex=X(data.length-1), ey=Y(data[data.length-1]);
+    ctx.beginPath(); ctx.arc(ex,ey,4,0,7); ctx.fillStyle=tok("--panel-2"); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex,ey,3,0,7); ctx.fillStyle=o.color; ctx.fill();
+  }
+  // combined indexed (rebased to 100) chart — relativ trend, en axel
+  var COMBO=[{key:"gold",label:"Guld",color:"#d4ad5e"},{key:"silver",label:"Silver",color:"#9bb4cf"},{key:"dxy",label:"DXY",color:"#7fae8f"}];
+  var legEl=document.getElementById("comboLegend");
+  if(legEl) legEl.innerHTML=COMBO.map(function(s){var a=S[s.key]||[];var p=(a.length&&a[0])?((a[a.length-1]-a[0])/a[0]*100):0;return '<span><i style="background:'+s.color+'"></i>'+s.label+' '+(p>=0?"+":"")+p.toFixed(1)+'%</span>';}).join("");
+  function drawCombo(){
+    var cv=document.getElementById("comboCanvas"); if(!cv) return;
+    var series=COMBO.map(function(s){var a=S[s.key]||[];var base=a[0]||1;return {color:s.color,data:a.map(function(v){return v/base*100;})};}).filter(function(s){return s.data.length;});
+    if(!series.length) return;
+    var ratio=Math.max(1,window.devicePixelRatio||1), w=cv.clientWidth||480, h=cv.clientHeight||190;
+    cv.width=Math.round(w*ratio); cv.height=Math.round(h*ratio);
+    var ctx=cv.getContext("2d"); ctx.setTransform(ratio,0,0,ratio,0,0); ctx.clearRect(0,0,w,h);
+    var all=series.reduce(function(acc,s){return acc.concat(s.data);},[]);
+    var min=Math.min.apply(null,all), max=Math.max.apply(null,all), pad=(max-min)*0.08||1; min-=pad; max+=pad;
+    var pl=6,pr=6,pt=8,pb=16, n=series[0].data.length;
+    function X(i){return pl+(w-pl-pr)*(n<2?0.5:i/(n-1));}
+    function Y(v){return pt+(h-pt-pb)*(1-(v-min)/(max-min||1));}
+    ctx.strokeStyle=tok("--line"); ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    var y100=Y(100); ctx.beginPath(); ctx.moveTo(pl,y100); ctx.lineTo(w-pr,y100); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=tok("--ink-faint"); ctx.font='10px '+tok("--mono"); ctx.textBaseline="middle"; ctx.fillText("100",pl+2,y100-7);
+    series.forEach(function(s){
+      ctx.beginPath(); ctx.moveTo(X(0),Y(s.data[0]));
+      for(var i=1;i<s.data.length;i++) ctx.lineTo(X(i),Y(s.data[i]));
+      ctx.strokeStyle=s.color; ctx.lineWidth=2; ctx.lineJoin="round"; ctx.lineCap="round"; ctx.stroke();
+      var ex=X(s.data.length-1), ey=Y(s.data[s.data.length-1]);
+      ctx.beginPath(); ctx.arc(ex,ey,3,0,7); ctx.fillStyle=s.color; ctx.fill();
+    });
+  }
+  function drawAll(){ canvases.forEach(draw); drawCombo(); }
+  drawAll();
+  var rt; window.addEventListener("resize",function(){ clearTimeout(rt); rt=setTimeout(drawAll,120); });
+  var tb=document.getElementById("themeBtn"); if(tb) tb.addEventListener("click",function(){ setTimeout(drawAll,30); });
+  if(window.matchMedia){ try{ matchMedia("(prefers-color-scheme:dark)").addEventListener("change",function(){ setTimeout(drawAll,30); }); }catch(e){} }
+})();
+</script>
+
+</body>
+</html>
