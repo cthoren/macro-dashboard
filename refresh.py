@@ -14,6 +14,7 @@ existing (last-good) macro data is kept — the run does not fail.
 """
 import re
 import io
+import os
 import csv
 import sys
 import json
@@ -61,13 +62,25 @@ def build_series(df: pd.DataFrame) -> dict:
 
 
 def fred(series_id: str, start: str, attempts: int = 4) -> list:
-    url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}&cosd={start}"
+    # Prefer the FRED API (api.stlouisfed.org) when a key is present — it responds
+    # reliably from GitHub Actions where the fredgraph.csv graph endpoint times out.
+    # Falls back to the keyless CSV endpoint otherwise.
+    key = os.environ.get("FRED_API_KEY")
+    if key:
+        url = (f"https://api.stlouisfed.org/fred/series/observations?series_id={series_id}"
+               f"&api_key={key}&file_type=json&observation_start={start}")
+    else:
+        url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}&cosd={start}"
     last = None
     for i in range(attempts):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            data = urllib.request.urlopen(req, timeout=60).read().decode()
-            rows = list(csv.reader(io.StringIO(data)))[1:]
+            raw = urllib.request.urlopen(req, timeout=60).read().decode()
+            if key:
+                obs = json.loads(raw).get("observations", [])
+                return [(o["date"], float(o["value"])) for o in obs
+                        if o.get("value") not in (".", "", None)]
+            rows = list(csv.reader(io.StringIO(raw)))[1:]
             return [(r[0], float(r[1])) for r in rows if len(r) >= 2 and r[1] not in (".", "")]
         except Exception as e:
             last = e
