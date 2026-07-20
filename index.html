@@ -107,6 +107,15 @@
   .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);
     color:var(--ink-soft);margin:0 0 4px;font-weight:600}
   .card .h2note{font-size:13px;color:var(--ink-faint);margin:0 0 16px}
+  /* läget-box (10-sek briefing) */
+  .lage{margin-bottom:20px}
+  .lage .eyebrow{margin-bottom:12px}
+  .lage-grid{display:flex;flex-direction:column;gap:11px}
+  .lage-row{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:baseline}
+  @media(max-width:560px){.lage-row{grid-template-columns:1fr;gap:2px}}
+  .lage-k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--brass);font-weight:600;padding-top:1px}
+  .lage-v{font-size:14.5px;color:var(--ink);line-height:1.5}
+  .lage-v b{font-weight:650}
 
   .factor{padding:14px 0;border-top:1px solid var(--line)}
   .factor:first-of-type{border-top:0;padding-top:2px}
@@ -231,6 +240,15 @@
     </div>
     <button class="theme-btn" id="themeBtn" type="button">Tema</button>
   </header>
+
+  <section class="card lage" aria-label="Läget — ögonblicksbild">
+    <div class="eyebrow">Läget · ögonblicksbild</div>
+    <div class="lage-grid">
+      <div class="lage-row"><span class="lage-k">Regim</span><span class="lage-v">Disinflation håller (CPI <b>3,5%</b> YoY, ner från 4,2), jobben svalnar (NFP <b>+57k</b>, U-tal 4,2%) → lutar <b>dovish</b>. Fed hökaktig i ord (Warsh), 0 sänkningar prissatta.</span></div>
+      <div class="lage-row"><span class="lage-k">Nästa test</span><span class="lage-v"><b>FOMC 29/7</b> (håll ~83%) → <b>PCE 30/7</b>. Mjuk PCE bekräftar dovish-banan (metall-medvind); het print + hökaktig Fed = motvind.</span></div>
+      <div class="lage-row"><span class="lage-k">Metaller</span><span class="lage-v">Guld ~$4 020 (<b>−28%</b> från jan-ATH) i rädsla — korrektion, inte topp. Exit-checklist på HOLD.</span></div>
+    </div>
+  </section>
 
   <section class="verdict">
     <div>
