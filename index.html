@@ -384,7 +384,7 @@
 
   <footer>
     <b>Läsning:</b> katalysator utan bekräftelse = fade. Om siffran fick metaller att rusa men US02Y och
-    realräntan inte följer med (eller realräntan stiger), underkänner räntemarknaden printen — precis juni 2026.
+    realräntan inte följer med (eller realräntan stiger), underkänner räntemarknaden printen — det klassiska fade-läget.
     <div class="legend">
       <span><span class="dot" style="background:var(--hold)"></span>Håller</span>
       <span><span class="dot" style="background:var(--fragile)"></span>Bräcklig</span>
@@ -528,7 +528,7 @@
     div.className="divergence";
     if(printSoft && ratesReject){
       div.classList.add("show","warn");
-      dt.innerHTML="<b>Divergens:</b> mjuk print (bull rubrik) men US02Y/realräntan bekräftar inte — realräntan steg eller 2Y rörde sig knappt. Räntemarknaden tror inte på printen. <b>Fade-mönstret (juni 2026).</b>";
+      dt.innerHTML="<b>Divergens:</b> mjuk print (bull rubrik) men US02Y/realräntan bekräftar inte — realräntan steg eller 2Y rörde sig knappt. Räntemarknaden tror inte på printen. <b>Det klassiska fade-mönstret.</b>";
     } else if(printBull && ratesConfirm && comp>=40){
       div.classList.add("show","ok");
       dt.innerHTML="<b>Samstämmigt:</b> bull print OCH räntemarknaden följer med. Det är då en rörelse brukar hålla bortom första 5 min.";
