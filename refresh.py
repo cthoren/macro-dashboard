@@ -125,6 +125,17 @@ def inject(series: dict, macro) -> None:
     datestr = f"{now.day} {MONTHS[now.month - 1]} {now.year}"
     html, n3 = re.subn(r'(<div class="eyebrow">[^<]*uppdaterad )[^<]*(</div>)',
                        lambda m: m.group(1) + datestr + m.group(2), html)
+    # Auto-fyll Läget-boxens metall-siffra (ren data): guld + % fran jan-ATH (~5608).
+    # Resten av Läget (regim/nästa test/narrativ) är omdöme -> uppdateras av /macro-release.
+    gold = series["gold"][-1]
+    ath = 5608.0
+    fra = round((gold - ath) / ath * 100)
+    gold_str = f"{gold:,.0f}".replace(",", " ")
+    fra_str = ("+" if fra >= 0 else "−") + str(abs(fra)) + "%"
+    html = re.sub(r'(<b data-mkt="gold">).*?(</b>)',
+                  lambda m: m.group(1) + gold_str + m.group(2), html, flags=re.S)
+    html = re.sub(r'(<b data-mkt="fromath">).*?(</b>)',
+                  lambda m: m.group(1) + fra_str + m.group(2), html, flags=re.S)
     HTML.write_text(html, encoding="utf-8")
     print(f"OK seriesdata:{n1} macrodata:{n2} eyebrow:{n3} datum '{datestr}'")
 
