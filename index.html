@@ -245,11 +245,11 @@
   </header>
 
   <section class="card lage" aria-label="Läget — ögonblicksbild">
-    <div class="eyebrow">Läget · ögonblicksbild · bedömt 20 juli 2026</div>
+    <div class="eyebrow" id="lageEyebrow">Läget · ögonblicksbild · bedömt 10 september 2026</div>
     <div class="lage-grid">
-      <div class="lage-row"><span class="lage-k">Regim</span><span class="lage-v">Disinflation håller (CPI <b>3,5%</b> YoY, ner från 4,2), jobben svalnar (NFP <b>+57k</b>, U-tal 4,2%) → lutar <b>dovish</b>. Fed hökaktig i ord (Warsh), 0 sänkningar prissatta.</span></div>
-      <div class="lage-row"><span class="lage-k">Nästa test</span><span class="lage-v"><b>FOMC 29/7</b> (håll ~83%) → <b>PCE 30/7</b>. Mjuk PCE bekräftar dovish-banan (metall-medvind); het print + hökaktig Fed = motvind.</span></div>
-      <div class="lage-row"><span class="lage-k">Metaller</span><span class="lage-v">Guld ~$<b data-mkt="gold">4 426</b> (<b data-mkt="fromath">−21%</b> från jan-ATH) i rädsla — korrektion, inte topp. Exit-checklist på HOLD.</span></div>
+      <div class="lage-row"><span class="lage-k">Regim</span><span class="lage-v">Konsumentpriserna fortsätter ned (KPI jul <b>3,4%</b> YoY, core 2,5%), men producentledet stiger energidrivet (PPI aug <b>5,4%</b> YoY, diesel +24%, core bara +0,2% MoM). Jobben har studsat (NFP aug <b>+162k</b>, revideringar +55k, U-tal 4,1%) → lutar <b>hökaktigt</b>. Fed höll 29/7 men tre ville höja; marknaden prisar nu <b>~64% höjning</b> 16/9.</span></div>
+      <div class="lage-row"><span class="lage-k">Nästa test</span><span class="lage-v"><b>KPI 11/9</b> (väntat 3,4% YoY) → <b>FOMC 16/9</b> med nya prognoser. Het core-KPI låser in höjningen = motvind för metaller; mjuk core kan pressa ut höjningsprissättningen = medvind.</span></div>
+      <div class="lage-row"><span class="lage-k">Metaller</span><span class="lage-v">Guld ~$<b data-mkt="gold">4 402</b> (<b data-mkt="fromath">−21%</b> från jan-ATH). PPI-dippen i guld återhämtades inom en timme, silver svagare än guld. Stigande 2Y (~4,5%) och 10Y (~4,9%) = motvind. Exit-laddern orörd (första delmål guld $5 000).</span></div>
     </div>
   </section>
 
@@ -267,7 +267,7 @@
       <div class="chart-top"><span class="chart-title">Relativ trend · indexerat till 100 (3 mån)</span><span class="mkt-legend" id="comboLegend"></span></div>
       <canvas id="comboCanvas"></canvas>
     </div>
-    <p class="h2note" style="margin:12px 0 0">Serier bakas in vid varje refresh (yfinance dagsstängning) — endpoint = senaste stängning. Delta = rörelse över fönstret.</p>
+    <p class="h2note" style="margin:12px 0 0">Guld och silver = COMEX-terminer (GC=F / SI=F) via yfinance — ligger normalt något över spotpris och är <b>inte realtid</b>. Datan hämtas efter amerikansk stängning och på morgonen; senaste punkt = senaste hämtning. Delta = rörelse över fönstret.</p>
   </section>
 
   <section class="card market" aria-label="Makro-trend">
@@ -288,32 +288,34 @@
         <h2>Fed-läge</h2>
         <p class="h2note" style="margin-bottom:10px">Styrränta nu</p>
         <div class="fed-rate">3,50–3,75<span>%</span></div>
-        <p class="fed-meta">Oförändrad sedan <b>17 juni</b> (Warshs första möte) · bias <b>hökaktig</b>, 9 av 18 vill höja i år · 0% sänkning prissatt på kort sikt.</p>
+        <p class="fed-meta">Oförändrad sedan <b>17 juni</b> · höll <b>29 juli</b> med 9–3 (Hammack, Kashkari och Logan ville höja) · marknaden prisar nu en <b>höjning</b>.</p>
         <div class="fed-next">
-          <div><span class="k">Nästa FOMC</span><span class="v">29 juli 2026</span><span class="p">0% sänkn · ~83% håll · ~17% höjn</span></div>
-          <div><span class="k">September</span><span class="v">Coin-flip håll/höjn</span><span class="p">44% höjn +25bp · ~51% håll · 0% sänkn</span></div>
+          <div><span class="k">Nästa FOMC</span><span class="v">16 september 2026</span><span class="p">~64% höjn +25bp prissatt (CME FedWatch, 10/9) · nya prognoser</span></div>
+          <div><span class="k">Oktober</span><span class="v">27–28 oktober</span><span class="p">prissättning ej verifierad</span></div>
         </div>
       </div>
       <div class="ds-timeline">
         <h2>Senaste släpp</h2>
-        <p class="h2note" style="margin-bottom:12px">Disinflation + svalnande jobb, tre släpp i rad</p>
-        <ol class="tl">
-          <li><span class="d">2 jul</span><span class="e"><b>Jobb (NFP)</b> +57k vs +115k väntat · apr+maj rev −74k · U-tal 4,2%</span><span class="tag svag">svag</span></li>
-          <li><span class="d">14 jul</span><span class="e"><b>CPI</b> −0,4% MoM · 3,5% YoY (från 4,2) · core 2,6% (från 2,9)</span><span class="tag mjuk">mjuk</span></li>
-          <li><span class="d">15 jul</span><span class="e"><b>PPI</b> −0,3% MoM · mest bensin −12%</span><span class="tag mjuk">mjuk</span></li>
+        <p class="h2note" style="margin-bottom:12px">Jobben studsade · producentpriserna upp, energidrivet</p>
+        <ol class="tl" id="latestList">
+          <li><span class="d">12 aug</span><span class="e"><b>KPI</b> (jul) +0,1% MoM · 3,4% YoY · core 2,5% · energi −1,5%</span><span class="tag mjuk">mjuk</span></li>
+          <li><span class="d">4 sep</span><span class="e"><b>Jobb (NFP)</b> (aug) +162k · jun+jul rev +55k · U-tal 4,1% · löner +3,1% YoY</span><span class="tag stark">stark</span></li>
+          <li><span class="d">10 sep</span><span class="e"><b>PPI</b> (aug) +0,4% MoM (i linje) · 5,4% YoY · core +0,2% (väntat 0,3) · diesel +24%</span><span class="tag het">het</span></li>
         </ol>
         <h2 style="margin-top:20px">Kommande släpp</h2>
-        <p class="h2note" style="margin-bottom:12px">Alla datum verifierade mot BLS/BEA/Fed-kalendrarna (19 juli 2026)</p>
-        <ol class="tl">
-          <li><span class="d">23 jul</span><span class="e"><b>Jobless claims</b> (US, veckovis) · föreg 208k</span><span class="tag sido">sido</span></li>
-          <li><span class="d">24 jul</span><span class="e"><b>Flash-PMI</b> (US, tillverkning 53,9 + tjänster 51,2 föreg)</span><span class="tag sido">sido</span></li>
-          <li><span class="d">29 jul</span><span class="e"><b>FOMC-beslut</b> · ~83% håll · ~17% höjn · inga sänkn prissatta</span><span class="tag nyckel">nyckel</span></li>
-          <li><span class="d">30 jul</span><span class="e"><b>PCE</b> (jun) · Feds favoritmått, dagen efter FOMC</span><span class="tag nyckel">nyckel</span></li>
-          <li><span class="d">7 aug</span><span class="e"><b>Jobb (NFP)</b> (jul) · nästa hårda arbetsmarknads-print</span><span class="tag nyckel">nyckel</span></li>
-          <li><span class="d">12 aug</span><span class="e"><b>CPI</b> (jul) · håller disinflationen?</span><span class="tag nyckel">nyckel</span></li>
-          <li><span class="d">13 aug</span><span class="e"><b>PPI</b> (jul) · tillverkarledet</span><span class="tag nyckel">nyckel</span></li>
+        <p class="h2note" style="margin-bottom:12px" id="upcomingNote">Datum verifierade mot BLS, BEA, Fed, BoJ och senaten (10 september 2026)</p>
+        <ol class="tl" id="upcomingList">
+          <li><span class="d">11 sep</span><span class="e"><b>KPI</b> (aug) · väntat 3,4% YoY</span><span class="tag nyckel">nyckel</span></li>
+          <li><span class="d">15 sep</span><span class="e"><b>Clarity Act</b> · procedurröstning i senaten, 60 röster krävs</span><span class="tag sido">sido</span></li>
+          <li><span class="d">16 sep</span><span class="e"><b>FOMC-beslut</b> + prognoser · ~64% höjn prissatt</span><span class="tag nyckel">nyckel</span></li>
+          <li><span class="d">18 sep</span><span class="e"><b>Bank of Japan</b> · räntebesked (möte 17–18/9)</span><span class="tag sido">sido</span></li>
+          <li><span class="d">2 okt</span><span class="e"><b>Jobb (NFP)</b> (sep)</span><span class="tag nyckel">nyckel</span></li>
+          <li><span class="d">14 okt</span><span class="e"><b>KPI</b> (sep)</span><span class="tag nyckel">nyckel</span></li>
+          <li><span class="d">15 okt</span><span class="e"><b>PPI</b> (sep)</span><span class="tag nyckel">nyckel</span></li>
+          <li><span class="d">28 okt</span><span class="e"><b>FOMC-beslut</b></span><span class="tag nyckel">nyckel</span></li>
+          <li><span class="d">29 okt</span><span class="e"><b>PCE</b> (sep) · Feds favoritmått</span><span class="tag nyckel">nyckel</span></li>
         </ol>
-        <p class="regime"><b>Regim-lutning (1–3 mån):</b> disinflation + svalnande arbetsmarknad lutar <b>dovish</b>. Men reaktionsmodellen nedan mäter bara om <b>dagens</b> rörelse håller — kortare horisont, där energidriven print + reverserande olja + hökaktig Fed fortfarande dominerar.</p>
+        <p class="regime"><b>Regim-lutning (1–3 mån):</b> jobben har studsat och räntemarknaden prisar en höjning → lutar <b>hökaktigt</b>. Konsumentledet (KPI) är fortfarande nedåt, så KPI 11/9 avgör om höjningsprissättningen håller. Reaktionsmodellen nedan mäter bara om <b>dagens</b> rörelse håller — kortare horisont.</p>
       </div>
     </div>
   </section>
@@ -339,8 +341,8 @@
     </div>
   </section>
 
-  <script id="seriesdata">window.__SERIES__={"dates": ["10/6", "11/6", "12/6", "15/6", "16/6", "17/6", "18/6", "22/6", "23/6", "24/6", "25/6", "26/6", "29/6", "30/6", "1/7", "2/7", "6/7", "7/7", "8/7", "9/7", "10/7", "13/7", "14/7", "15/7", "16/7", "17/7", "20/7", "21/7", "22/7", "23/7", "24/7", "27/7", "28/7", "29/7", "30/7", "31/7", "3/8", "4/8", "5/8", "6/8", "7/8", "10/8", "11/8", "12/8", "13/8", "14/8", "17/8", "18/8", "19/8", "20/8", "21/8", "24/8", "25/8", "26/8", "27/8", "28/8", "31/8", "1/9", "2/9", "3/9", "4/9", "8/9", "9/9", "10/9"], "gold": [4108.2, 4090.3, 4215.0, 4328.0, 4330.9, 4358.9, 4224.1, 4181.9, 4129.9, 3990.3, 4030.5, 4078.7, 4022.3, 4022.9, 4068.3, 4112.7, 4155.1, 4145.3, 4070.9, 4130.6, 4104.1, 3997.0, 4061.1, 4044.0, 3985.6, 4012.7, 4010.3, 4071.1, 4146.9, 4046.6, 4067.6, 4074.5, 4036.3, 4034.7, 4100.1, 4049.1, 4033.7, 4095.4, 4245.8, 4242.0, 4340.7, 4361.8, 4383.0, 4408.9, 4363.6, 4380.4, 4417.8, 4366.0, 4489.4, 4516.3, 4624.1, 4640.8, 4638.1, 4598.2, 4609.7, 4478.1, 4431.1, 4348.0, 4366.3, 4491.7, 4429.8, 4393.9, 4416.0, 4425.8], "silver": [64.6, 63.88, 67.86, 70.07, 69.9, 70.7, 66.25, 65.53, 62.02, 58.05, 58.35, 59.22, 58.17, 59.48, 60.08, 60.64, 61.92, 60.93, 58.16, 60.38, 59.81, 57.63, 58.77, 57.11, 55.9, 56.04, 56.8, 58.83, 60.02, 57.8, 58.66, 58.47, 57.3, 57.86, 58.81, 57.59, 57.67, 60.06, 62.1, 61.44, 63.33, 65.11, 64.77, 65.56, 64.87, 64.99, 66.12, 63.94, 65.73, 68.03, 69.47, 68.54, 68.64, 67.99, 69.43, 67.0, 66.22, 64.62, 64.72, 66.97, 66.05, 66.3, 67.94, 66.35], "dxy": [99.95, 99.86, 99.75, 99.63, 99.54, 100.09, 100.85, 101.02, 101.41, 101.61, 101.43, 101.36, 101.11, 101.19, 101.39, 100.86, 100.85, 101.14, 101.05, 100.94, 100.97, 101.28, 100.94, 100.5, 100.73, 100.75, 100.99, 101.18, 101.14, 101.43, 101.47, 101.51, 101.38, 100.8, 100.01, 99.8, 99.96, 99.89, 99.69, 99.97, 99.6, 99.81, 99.82, 100.01, 99.96, 99.67, 99.64, 99.65, 98.83, 98.9, 98.8, 99.0, 98.92, 99.17, 99.16, 99.7, 99.43, 99.67, 99.56, 99.0, 99.16, 98.84, 98.77, 98.93], "gs": [63.6, 64.0, 62.1, 61.8, 62.0, 61.7, 63.8, 63.8, 66.6, 68.7, 69.1, 68.9, 69.1, 67.6, 67.7, 67.8, 67.1, 68.0, 70.0, 68.4, 68.6, 69.4, 69.1, 70.8, 71.3, 71.6, 70.6, 69.2, 69.1, 70.0, 69.3, 69.7, 70.4, 69.7, 69.7, 70.3, 69.9, 68.2, 68.4, 69.0, 68.5, 67.0, 67.7, 67.3, 67.3, 67.4, 66.8, 68.3, 68.3, 66.4, 66.6, 67.7, 67.6, 67.6, 66.4, 66.8, 66.9, 67.3, 67.5, 67.1, 67.1, 66.3, 65.0, 66.7], "asof": "2026-09-10 11:24 UTC"};</script>
-  <script id="macrodata">window.__MACRO__={"asof": "2026-09-10 11:24 UTC", "us2y": {"dates": ["5/6", "8/6", "9/6", "10/6", "11/6", "12/6", "15/6", "16/6", "17/6", "18/6", "22/6", "23/6", "24/6", "25/6", "26/6", "29/6", "30/6", "1/7", "2/7", "6/7", "7/7", "8/7", "9/7", "10/7", "13/7", "14/7", "15/7", "16/7", "17/7", "20/7", "21/7", "22/7", "23/7", "24/7", "27/7", "28/7", "29/7", "30/7", "31/7", "3/8", "4/8", "5/8", "6/8", "7/8", "10/8", "11/8", "12/8", "13/8", "14/8", "17/8", "18/8", "19/8", "20/8", "21/8", "24/8", "25/8", "26/8", "27/8", "28/8", "31/8", "1/9", "2/9", "3/9", "4/9", "8/9"], "vals": [4.17, 4.15, 4.13, 4.13, 4.05, 4.09, 4.07, 4.05, 4.2, 4.19, 4.24, 4.16, 4.11, 4.09, 4.07, 4.1, 4.14, 4.17, 4.14, 4.13, 4.19, 4.21, 4.16, 4.21, 4.26, 4.18, 4.13, 4.16, 4.18, 4.21, 4.26, 4.31, 4.37, 4.33, 4.31, 4.26, 4.22, 4.23, 4.28, 4.25, 4.2, 4.18, 4.25, 4.19, 4.25, 4.22, 4.2, 4.15, 4.17, 4.19, 4.19, 4.19, 4.19, 4.24, 4.24, 4.17, 4.19, 4.2, 4.34, 4.34, 4.39, 4.39, 4.34, 4.37, 4.39], "unit": "%", "dec": 2}, "real": {"dates": ["5/6", "8/6", "9/6", "10/6", "11/6", "12/6", "15/6", "16/6", "17/6", "18/6", "22/6", "23/6", "24/6", "25/6", "26/6", "29/6", "30/6", "1/7", "2/7", "6/7", "7/7", "8/7", "9/7", "10/7", "13/7", "14/7", "15/7", "16/7", "17/7", "20/7", "21/7", "22/7", "23/7", "24/7", "27/7", "28/7", "29/7", "30/7", "31/7", "3/8", "4/8", "5/8", "6/8", "7/8", "10/8", "11/8", "12/8", "13/8", "14/8", "17/8", "18/8", "19/8", "20/8", "21/8", "24/8", "25/8", "26/8", "27/8", "28/8", "31/8", "1/9", "2/9", "3/9", "4/9", "8/9"], "vals": [2.19, 2.21, 2.2, 2.21, 2.16, 2.17, 2.15, 2.14, 2.23, 2.21, 2.28, 2.29, 2.23, 2.19, 2.18, 2.16, 2.2, 2.25, 2.26, 2.24, 2.3, 2.31, 2.31, 2.32, 2.36, 2.33, 2.32, 2.35, 2.31, 2.35, 2.37, 2.39, 2.43, 2.43, 2.44, 2.41, 2.41, 2.41, 2.47, 2.43, 2.4, 2.41, 2.43, 2.4, 2.43, 2.43, 2.42, 2.39, 2.41, 2.44, 2.41, 2.35, 2.35, 2.4, 2.38, 2.32, 2.34, 2.34, 2.42, 2.44, 2.44, 2.45, 2.42, 2.43, 2.43], "unit": "%", "dec": 2}, "cpi": {"dates": ["5/25", "6/25", "7/25", "8/25", "9/25", "11/25", "12/25", "1/26", "2/26", "3/26", "4/26", "5/26", "6/26", "7/26"], "vals": [2.4, 2.7, 2.7, 2.9, 3.0, 3.0, 3.0, 2.8, 2.7, 3.3, 3.9, 4.3, 3.7, 3.5], "unit": "%", "dec": 1}, "nfp": {"dates": ["7/25", "8/25", "9/25", "10/25", "11/25", "12/25", "1/26", "2/26", "3/26", "4/26", "5/26", "6/26", "7/26", "8/26"], "vals": [64, -70, 76, -140, 41, -17, 160, -156, 214, 148, 63, 31, 21, 162], "unit": "k", "dec": 0}};</script>
+  <script id="seriesdata">window.__SERIES__={"dates": ["10/6", "11/6", "12/6", "15/6", "16/6", "17/6", "18/6", "22/6", "23/6", "24/6", "25/6", "26/6", "29/6", "30/6", "1/7", "2/7", "6/7", "7/7", "8/7", "9/7", "10/7", "13/7", "14/7", "15/7", "16/7", "17/7", "20/7", "21/7", "22/7", "23/7", "24/7", "27/7", "28/7", "29/7", "30/7", "31/7", "3/8", "4/8", "5/8", "6/8", "7/8", "10/8", "11/8", "12/8", "13/8", "14/8", "17/8", "18/8", "19/8", "20/8", "21/8", "24/8", "25/8", "26/8", "27/8", "28/8", "31/8", "1/9", "2/9", "3/9", "4/9", "8/9", "9/9", "10/9"], "gold": [4108.2, 4090.3, 4215.0, 4328.0, 4330.9, 4358.9, 4224.1, 4181.9, 4129.9, 3990.3, 4030.5, 4078.7, 4022.3, 4022.9, 4068.3, 4112.7, 4155.1, 4145.3, 4070.9, 4130.6, 4104.1, 3997.0, 4061.1, 4044.0, 3985.6, 4012.7, 4010.3, 4071.1, 4146.9, 4046.6, 4067.6, 4074.5, 4036.3, 4034.7, 4100.1, 4049.1, 4033.7, 4095.4, 4245.8, 4242.0, 4340.7, 4361.8, 4383.0, 4408.9, 4363.6, 4380.4, 4417.8, 4366.0, 4489.4, 4516.3, 4624.1, 4640.8, 4638.1, 4598.2, 4609.7, 4478.1, 4431.1, 4348.0, 4366.3, 4491.7, 4429.8, 4393.9, 4416.0, 4402.3], "silver": [64.6, 63.88, 67.86, 70.07, 69.9, 70.7, 66.25, 65.53, 62.02, 58.05, 58.35, 59.22, 58.17, 59.48, 60.08, 60.64, 61.92, 60.93, 58.16, 60.38, 59.81, 57.63, 58.77, 57.11, 55.9, 56.04, 56.8, 58.83, 60.02, 57.8, 58.66, 58.47, 57.3, 57.86, 58.81, 57.59, 57.67, 60.06, 62.1, 61.44, 63.33, 65.11, 64.77, 65.56, 64.87, 64.99, 66.12, 63.94, 65.73, 68.03, 69.47, 68.54, 68.64, 67.99, 69.43, 67.0, 66.22, 64.62, 64.72, 66.97, 66.05, 66.3, 67.94, 64.99], "dxy": [99.95, 99.86, 99.75, 99.63, 99.54, 100.09, 100.85, 101.02, 101.41, 101.61, 101.43, 101.36, 101.11, 101.19, 101.39, 100.86, 100.85, 101.14, 101.05, 100.94, 100.97, 101.28, 100.94, 100.5, 100.73, 100.75, 100.99, 101.18, 101.14, 101.43, 101.47, 101.51, 101.38, 100.8, 100.01, 99.8, 99.96, 99.89, 99.69, 99.97, 99.6, 99.81, 99.82, 100.01, 99.96, 99.67, 99.64, 99.65, 98.83, 98.9, 98.8, 99.0, 98.92, 99.17, 99.16, 99.7, 99.43, 99.67, 99.56, 99.0, 99.16, 98.84, 98.77, 98.98], "gs": [63.6, 64.0, 62.1, 61.8, 62.0, 61.7, 63.8, 63.8, 66.6, 68.7, 69.1, 68.9, 69.1, 67.6, 67.7, 67.8, 67.1, 68.0, 70.0, 68.4, 68.6, 69.4, 69.1, 70.8, 71.3, 71.6, 70.6, 69.2, 69.1, 70.0, 69.3, 69.7, 70.4, 69.7, 69.7, 70.3, 69.9, 68.2, 68.4, 69.0, 68.5, 67.0, 67.7, 67.3, 67.3, 67.4, 66.8, 68.3, 68.3, 66.4, 66.6, 67.7, 67.6, 67.6, 66.4, 66.8, 66.9, 67.3, 67.5, 67.1, 67.1, 66.3, 65.0, 67.7], "asof": "2026-09-10 14:34 UTC"};</script>
+  <script id="macrodata">window.__MACRO__={"asof": "2026-09-10 14:34 UTC", "us2y": {"dates": ["5/6", "8/6", "9/6", "10/6", "11/6", "12/6", "15/6", "16/6", "17/6", "18/6", "22/6", "23/6", "24/6", "25/6", "26/6", "29/6", "30/6", "1/7", "2/7", "6/7", "7/7", "8/7", "9/7", "10/7", "13/7", "14/7", "15/7", "16/7", "17/7", "20/7", "21/7", "22/7", "23/7", "24/7", "27/7", "28/7", "29/7", "30/7", "31/7", "3/8", "4/8", "5/8", "6/8", "7/8", "10/8", "11/8", "12/8", "13/8", "14/8", "17/8", "18/8", "19/8", "20/8", "21/8", "24/8", "25/8", "26/8", "27/8", "28/8", "31/8", "1/9", "2/9", "3/9", "4/9", "8/9"], "vals": [4.17, 4.15, 4.13, 4.13, 4.05, 4.09, 4.07, 4.05, 4.2, 4.19, 4.24, 4.16, 4.11, 4.09, 4.07, 4.1, 4.14, 4.17, 4.14, 4.13, 4.19, 4.21, 4.16, 4.21, 4.26, 4.18, 4.13, 4.16, 4.18, 4.21, 4.26, 4.31, 4.37, 4.33, 4.31, 4.26, 4.22, 4.23, 4.28, 4.25, 4.2, 4.18, 4.25, 4.19, 4.25, 4.22, 4.2, 4.15, 4.17, 4.19, 4.19, 4.19, 4.19, 4.24, 4.24, 4.17, 4.19, 4.2, 4.34, 4.34, 4.39, 4.39, 4.34, 4.37, 4.39], "unit": "%", "dec": 2}, "real": {"dates": ["5/6", "8/6", "9/6", "10/6", "11/6", "12/6", "15/6", "16/6", "17/6", "18/6", "22/6", "23/6", "24/6", "25/6", "26/6", "29/6", "30/6", "1/7", "2/7", "6/7", "7/7", "8/7", "9/7", "10/7", "13/7", "14/7", "15/7", "16/7", "17/7", "20/7", "21/7", "22/7", "23/7", "24/7", "27/7", "28/7", "29/7", "30/7", "31/7", "3/8", "4/8", "5/8", "6/8", "7/8", "10/8", "11/8", "12/8", "13/8", "14/8", "17/8", "18/8", "19/8", "20/8", "21/8", "24/8", "25/8", "26/8", "27/8", "28/8", "31/8", "1/9", "2/9", "3/9", "4/9", "8/9"], "vals": [2.19, 2.21, 2.2, 2.21, 2.16, 2.17, 2.15, 2.14, 2.23, 2.21, 2.28, 2.29, 2.23, 2.19, 2.18, 2.16, 2.2, 2.25, 2.26, 2.24, 2.3, 2.31, 2.31, 2.32, 2.36, 2.33, 2.32, 2.35, 2.31, 2.35, 2.37, 2.39, 2.43, 2.43, 2.44, 2.41, 2.41, 2.41, 2.47, 2.43, 2.4, 2.41, 2.43, 2.4, 2.43, 2.43, 2.42, 2.39, 2.41, 2.44, 2.41, 2.35, 2.35, 2.4, 2.38, 2.32, 2.34, 2.34, 2.42, 2.44, 2.44, 2.45, 2.42, 2.43, 2.43], "unit": "%", "dec": 2}, "cpi": {"dates": ["5/25", "6/25", "7/25", "8/25", "9/25", "11/25", "12/25", "1/26", "2/26", "3/26", "4/26", "5/26", "6/26", "7/26"], "vals": [2.4, 2.7, 2.7, 2.9, 3.0, 3.0, 3.0, 2.8, 2.7, 3.3, 3.9, 4.3, 3.7, 3.5], "unit": "%", "dec": 1}, "nfp": {"dates": ["7/25", "8/25", "9/25", "10/25", "11/25", "12/25", "1/26", "2/26", "3/26", "4/26", "5/26", "6/26", "7/26", "8/26"], "vals": [64, -70, 76, -140, 41, -17, 160, -156, 214, 148, 63, 31, 21, 162], "unit": "k", "dec": 0}};</script>
 
   <div class="cols">
     <section class="card" aria-label="Viktade faktorer">
@@ -553,13 +555,43 @@
   // Knappen "Ladda senaste släppet" läser ALLTID härifrån. Byt bara detta objekt —
   // aldrig knappens text. Släppets namn/datum står i .label.
   var LATEST={
-    label:"CPI 14 juli 2026",
-    // 2Y föll bara ~4bp på -0,4% CPI = icke-bekräftelse (0); 10Y realränta steg (-1);
-    // DXY föll ~-0,28% (+1); jobb (2/7) +57k vs +115k, U-tal 4,2% = svag (+1);
-    // positionering ingen verifierad flödesdata (0); print mjuk men energidriven, core flat;
-    // energidriven=ja, Brent upp (US-Iran)
-    us2y:2, real:1, dxy:3, jobs:3, pos:2, print:3, energy:1, brent:"up"
+    label:"PPI 10 september 2026",
+    // 2Y ~4,53% (+8bp på dagen, Trading Economics) = steg (-1; hela rörelsen ej säkert PPI-driven);
+    // realränta: TIP-ETF -0,3% efter släppet = realräntan steg (-1); DXY ~oförändrad (0);
+    // jobb (4/9) +162k, rev +55k, U-tal 4,1% = stark (-1); positionering ingen verifierad data (0);
+    // print: rubrik +0,4% i linje, core +0,2% under väntat, driven av energi/diesel = i linje (0);
+    // energidriven=ja, Brent upp (~101 -> ~104)
+    us2y:1, real:1, dxy:2, jobs:1, pos:2, print:2, energy:1, brent:"up"
   };
+
+  // ---- färskhets-vakt: varna synligt när Läget eller släpplistan blivit inaktuell ----
+  (function(){
+    var MON={jan:0,feb:1,mar:2,apr:3,maj:4,jun:5,jul:6,aug:7,sep:8,okt:9,nov:10,dec:11};
+    var today=new Date(); today.setHours(0,0,0,0);
+    var warn='color:var(--fade);font-weight:700';
+    var le=document.getElementById("lageEyebrow");
+    if(le){
+      var m=le.textContent.match(/bedömt (\d+) ([a-zåäö]+) (\d{4})/i);
+      if(m){
+        var mi=MON[m[2].slice(0,3).toLowerCase()];
+        if(mi!==undefined){
+          var d=new Date(+m[3],mi,+m[1]); var days=Math.round((today-d)/864e5);
+          if(days>21){ le.insertAdjacentHTML("beforeend",' <span style="'+warn+'">· INAKTUELL — bedömd för '+days+' dagar sedan, kör /macro-release</span>'); }
+        }
+      }
+    }
+    var ul=document.getElementById("upcomingList"), un=document.getElementById("upcomingNote");
+    if(ul&&un){
+      var passed=0;
+      ul.querySelectorAll(".d").forEach(function(el){
+        var mm=el.textContent.trim().match(/^(\d+) ([a-zåäö]+)/i); if(!mm) return;
+        var mi=MON[mm[2].slice(0,3).toLowerCase()]; if(mi===undefined) return;
+        var y=today.getFullYear(); if(mi<today.getMonth()-6) y++;
+        if(new Date(y,mi,+mm[1])<today){ passed++; el.parentNode.style.opacity=".45"; }
+      });
+      if(passed>0){ un.insertAdjacentHTML("beforeend",' <span style="'+warn+'">· '+passed+' släpp har passerat — listan behöver rullas</span>'); }
+    }
+  })();
   document.getElementById("loadLatest").addEventListener("click",function(){
     setSeg("us2y",LATEST.us2y); setSeg("real",LATEST.real); setSeg("dxy",LATEST.dxy);
     setSeg("jobs",LATEST.jobs); setSeg("pos",LATEST.pos); setSeg("print",LATEST.print);
@@ -589,13 +621,13 @@
   var chartsEl=document.getElementById("mktCharts"), tilesEl=document.getElementById("mktTiles");
   if(!S.dates||!S.dates.length){ if(chartsEl) chartsEl.innerHTML='<p class="h2note">Ingen serie-data annu.</p>'; return; }
   var META=[
-    {key:"gold",  title:"Guld",              pre:"$", dec:0, color:"#d4ad5e"},
-    {key:"silver",title:"Silver",            pre:"$", dec:2, color:"#9bb4cf"},
+    {key:"gold",  title:"Guld (termin)",     pre:"$", dec:0, color:"#d4ad5e"},
+    {key:"silver",title:"Silver (termin)",   pre:"$", dec:2, color:"#9bb4cf"},
     {key:"gs",    title:"Guld/Silver-ratio", pre:"",  dec:1, color:"#c08457"},
     {key:"dxy",   title:"DXY",               pre:"",  dec:2, color:"#7fae8f"}
   ];
   function nf(v,dec){ return (v==null)?"—":Number(v).toLocaleString("sv-SE",{minimumFractionDigits:dec,maximumFractionDigits:dec}); }
-  var asofEl=document.getElementById("mktAsof"); if(asofEl) asofEl.textContent = S.asof ? ("kl "+S.asof) : "";
+  var asofEl=document.getElementById("mktAsof"); if(asofEl) asofEl.textContent = S.asof ? ("hämtat "+S.asof+" · ej realtid") : "";
   var canvases=[];
   META.forEach(function(m){
     var a=S[m.key]||[]; if(!a.length) return;

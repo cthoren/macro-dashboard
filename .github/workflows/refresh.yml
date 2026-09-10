@@ -2,6 +2,7 @@ name: refresh
 on:
   schedule:
     - cron: '17 6 * * *'   # 06:17 UTC daily (~08:17 CEST)
+    - cron: '35 21 * * 1-5' # 21:35 UTC weekdays, after COMEX/US close -> real daily close
   workflow_dispatch:
 permissions:
   contents: write
