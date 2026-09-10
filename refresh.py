@@ -123,7 +123,8 @@ def inject(series: dict, macro) -> None:
         html, n2 = swap("macrodata", macro, "window.__MACRO__")
     now = datetime.date.today()
     datestr = f"{now.day} {MONTHS[now.month - 1]} {now.year}"
-    html, n3 = re.subn(r'(<div class="eyebrow">[^<]*uppdaterad )[^<]*(</div>)',
+    # Stämpeln gäller BARA priser/ränteserier (auto). Läget + släpplistor har egen "bedömt"-datum + färskhetsvakt.
+    html, n3 = re.subn(r'(<div class="eyebrow">[^<]*priser uppdaterade )[^<]*(</div>)',
                        lambda m: m.group(1) + datestr + m.group(2), html)
     # Auto-fyll Läget-boxens metall-siffra (ren data): guld + % fran jan-ATH (~5608).
     # Resten av Läget (regim/nästa test/narrativ) är omdöme -> uppdateras av /macro-release.
