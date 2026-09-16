@@ -7,7 +7,7 @@ Runs headless in GitHub Actions daily.
 Sources:
   - yfinance: gold/silver/DXY daily closes (3mo) -> market strip + trend charts + G/S ratio
   - FRED (public CSV, no key): DGS2 (2Y), DFII10 (10Y real), CPIAUCSL (CPI YoY),
-    PAYEMS (NFP monthly change) -> "Makro-trend" section
+    PAYEMS (NFP monthly change); CPI YoY = CPIAUCNS per datum -> "Makro-trend" section
 
 Resilient: if FRED is slow/unreachable from CI, prices still update and the
 existing (last-good) macro data is kept — the run does not fail.
@@ -98,8 +98,13 @@ def build_macro() -> dict:
         d = fred(sid, "2026-04-01")[-65:]
         out[key] = {"dates": [_dm(x[0]) for x in d],
                     "vals": [round(x[1], 2) for x in d], "unit": "%", "dec": 2}
-    cpi = fred("CPIAUCSL", "2024-01-01")
-    yoy = [(cpi[i][0], (cpi[i][1] / cpi[i - 12][1] - 1) * 100) for i in range(12, len(cpi))][-14:]
+    # KPI YoY per DATUM (samma månad året före), ej "12 rader bakåt": FRED saknar okt 2025
+    # (nedstängningen) och positionsindex gav då fel månad (aug-26 mot jul-25 = 3,7% i st f 3,4%).
+    # CPIAUCNS (ej säsongsjusterad) = BLS rubrikens YoY.
+    cpi = fred("CPIAUCNS", "2024-01-01")
+    lvl = dict(cpi)
+    def _prev(d): y, m, dd = d.split("-"); return f"{int(y) - 1}-{m}-{dd}"
+    yoy = [(d, (v / lvl[_prev(d)] - 1) * 100) for d, v in cpi if _prev(d) in lvl][-14:]
     out["cpi"] = {"dates": [_myy(x[0]) for x in yoy],
                   "vals": [round(x[1], 1) for x in yoy], "unit": "%", "dec": 1}
     pay = fred("PAYEMS", "2024-06-01")
