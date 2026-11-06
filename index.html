@@ -331,7 +331,7 @@
         <ol class="tl" id="latestList">
           <li><span class="d">28 okt</span><span class="e"><b>FOMC</b> håll 3,75–4,00% · röst 10–2, Cook + Hammack ville +25bp · "Inflation remains elevated" · Warsh: färre räntemöten från 2027</span><span class="tag het">hök</span></li>
           <li><span class="d">29 okt</span><span class="e"><b>PCE</b> (sep) +0,5% MoM (väntat 0,3) · 3,6% YoY (väntat 3,6) · core +0,3% MoM · 3,1% YoY (båda i linje) · <b>BNP Q3</b> 3,4% (väntat 3,0–3,2) · <b>ansökningar</b> 194K (väntat 199K) · reaktion: 2-årsräntan −2 bp, realränta och dollar oförändrade</span><span class="tag het">rubrik het</span></li>
-          <li><span class="d">6 nov</span><span class="e"><b>Jobb (NFP)</b> (okt) +165K (väntat 65K) · aug+sep uppreviderade +84K · arbetslöshet 4,1% (väntat 4,2) · timlön +0,4% MoM (väntat 0,3), 3,1% YoY · reaktion: 2-årsräntan +1,5 bp (topp +4), realränta −1 bp, dollar oförändrad</span><span class="tag het">stark</span></li>
+          <li><span class="d">6 nov</span><span class="e"><b>Jobb (NFP)</b> (okt) +165K (väntat 65K) · aug+sep uppreviderade +84K · arbetslöshet 4,1% (väntat 4,2) · timlön +0,4% MoM (väntat 0,3), 3,1% YoY · reaktion efter 1,5 h: 2-årsräntan +3 bp, realränta oförändrad, dollar +0,2%, guld −0,2%, silver −0,9%</span><span class="tag het">stark</span></li>
         </ol>
         <p class="regime"><b>Regim-lutning (1–3 mån):</b> Fed höjde 16/9 och prognoserna visar en höjning till i år. Underlaget vittrade i början av oktober — PCE 30/9 under väntan och NFP 2/10 klart svagare med 60k nedreviderade jobb bakåt — men <b>KPI 14/10 och PPI 15/10 vände lutningen hökaktig</b>. PPI avgjorde bred-kontra-energi-frågan åt båda hållen: energi +10,8%, men core ex mat/energi +0,7% m/m mot väntat 0,3 och handelsmarginaler +1,4% är bredd, inte bensin. Samtidigt är efterfrågan svag (NFP +29k, detaljhandelns kontrollgrupp +0,1% mot väntat 0,3) — <b>stagflationsklämma</b>. FOMC 28/10 höll men med två höjningsröster, och december-höjningen är nu ~85% prissatt (från 63% 15/10) — <b>divergensen mellan printar och räntemarknad har stängts åt hökhållet</b>. <b>PCE 29/10 ändrade inget:</b> rubriken het av energi (+0,5% m/m), core i linje (0,3% / 3,1%), BNP stark (3,4%) och få nya arbetslösa (194K) — räntorna rörde sig knappt. <b>NFP 6/11 tog bort svaga-jobb-benet</b> i stagflationsklämman: +165K mot väntat 65K, 84K uppreviderat bakåt, arbetslöshet ned till 4,1% och timlön +0,4% — men 2-årsräntan steg bara 1,5 bp, så marknaden hade redan prisat höjningen. Avgörande nu: <b>KPI 10/11</b> inför FOMC 8–9/12. Reaktionsmodellen nedan mäter bara om <b>dagens</b> rörelse håller — kortare horisont.</p>
       </div>
@@ -596,7 +596,9 @@
     // Reaktion 08:29→08:36 ET (CNBC 1-min): US2Y 4,501→4,541 (topp)→4,516 (+1,5 bp, litet på en stor överraskning), TIPS 2,629→2,619, DXY 102,05→102,08,
     // guld fut 4069→4047→4060, silver 52,25→51,78→51,96. Brent 98,4 oförändrad. Inget inflationssläpp.
     // us2y = Oförändrad (icke-bekräftelse) · real = Oförändrad · dxy = Oförändrad · jobs = Mycket stark · pos = Neutral · print = I linje (ej släpp) · energy=0, brent flat.
-    us2y:2, real:2, dxy:2, jobs:0, pos:2, print:2, energy:0, brent:"flat"
+    // Fade-check 10:03 ET (CNBC 1-min): US2Y 4,534 (+3,3 bp mot 08:29) → us2y omsatt till Steg; TIPS 2,622 (−0,7 bp), DXY 102,22 (+0,17%),
+    // guld fut 4059,5 (−0,2%), silver fut 51,80 (−0,9%), Brent 97,8.
+    us2y:1, real:2, dxy:2, jobs:0, pos:2, print:2, energy:0, brent:"flat"
   };
 
   // ---- färskhets-vakt: varna synligt när Läget eller släpplistan blivit inaktuell ----
